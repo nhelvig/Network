@@ -233,5 +233,78 @@ public class Gameboard {
   private int findConnections(int color, int x, int y, int total, int direction, int[][] previousChips) {
     
   }
+  
+   public boolean isValid (Move m, int color) {
+        //No chip may be placed in any of the four corners
+        if ((m.x1 == 0 && m.y1 == 0) || (m.x1 == 0 && m.y1 == 7) || (m.x1 == 7 && m.y1 == 0) || (m.x1 == 7 && m.y1 == 7))
+            return false;
+
+        //No chip may be placed in a goal of the opposite color
+        if ((color == WHITE) && (m.y1 == 0 || m.y1 == 7)) 
+            return false
+        if ((color == BLACK) && (m.x1 == 0 || m.x1 == 7)) 
+            return false
+
+	//No chip may be placed in a square that is already occupied
+      	if (pieces [m.x1][m.y1] != EMPTY)
+            return false;
+
+	//A player may not have more than two chips in a connected group, whether connected orthogonally or diagonally
+        int [] adjacentPiece = checkAround (m.x1, m.y1);
+        if (adjacentPiece [0] == -1 && adjacentPiece[1] == -1)
+            return true;
+        if (adjacentPiece [0] == -2 && adjacentPiece[1] == -2)
+            return false;
+        
+        adjacentPiece = checkAround (adjacentPiece[0], adjacentPiece[1]);
+        if (adjacentPiece [0] == -1 && adjacentPiece[1] == -1)
+            return true;
+
+        return false;
+    }
+
+    private int [] checkAround (int x, int y) {
+	int [] position = new int [2];
+        position [0] = -1;
+        position [1] = -1;
+        int count = 0;
+
+	// Check all around position for pieces
+	for (int i = -1; i <= 1; i++) {
+	    //Left border case
+            if (x == 0)
+                i = 0;
+            //Right border case
+            if (x == 7 && i == 1) 
+                continue;
+	    
+            for (int j = -1; j <= 1; j++) {
+                //Don't return starting position
+                if (i == 0 && j == 0) 
+                    continue;
+                //Top border case
+                if (y == 0)
+                    j = 0;
+                //Bottom border case
+                if (y == 7 && j == 1)
+                    continue;
+
+                
+                if (pieces[x+i][y+j] != EMPTY) {
+                    position[0] = x + i;
+                    position[1] = y + j;
+                    count ++;
+                  
+		}
+	    }
+	}
+
+        if (count >= 2) {
+            position [0] = -2;
+            position [1] = -2;
+	}
+
+        return position;
+    }
 
 }
