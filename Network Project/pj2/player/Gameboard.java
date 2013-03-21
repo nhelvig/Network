@@ -104,6 +104,23 @@ public void makeMove (int color, Move m) {
             side = WHITE;
         return side;
     }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+
+//Hello!!!!!!
+public class Gameboard {
+
+
+	public int[][] board;
+	private static final int EMPTY = -1;
+	private static final int WHITE = 1;
+  	private static final int BLACK = 2;
+  	private boolean hasNetwork;
+
+	public Gameboard() {
+		board = new int[8][8];
+		hasNetwork = false;
+	}
 
   // Implemented by Nick
   // validMoves generates a list of all possible moves by going through each space of
@@ -113,7 +130,7 @@ public void makeMove (int color, Move m) {
   // validMoves takes no parameters
   // returns an array of valid moves
   protected Move[] validMoves(int color) {
-    Move[] valids;
+    Move[] valids = new Move[77];
     int index = 0;
     for (int x = 0; x <= 8; x++) {
       for (int y = 0; y <= 8; y++) { 
@@ -138,116 +155,116 @@ public void makeMove (int color, Move m) {
   //         not of the same color, returns null
 
   protected int[] cChipsUp (int color, int x, int y) {
-    int[] position;
-    while (y >= 0) {
+    int[] position = new int[2];
+    while (y > 0) {
+      y--;
       if (board[x][y] == color) {
         position[0] = x;
         position[1] = y;
         return position;
       }
-      y--;
     }
     position[0] = EMPTY;
     return position;
   }
 
   protected int[] cChipsDown (int color, int x, int y) {
-    int[] position;
-    while (y <= 7) {
+    int[] position = new int[2];
+    while (y < 7) {
+      y++;
       if (board[x][y] == color) {
         position[0] = x;
         position[1] = y;
         return position;
       }
-      y++;
     }
     position[0] = EMPTY;
     return position;
   }
 
   protected int[] cChipsRight (int color, int x, int y) {
-    int[] position;
-    while (x <= 7) {
+    int[] position = new int[2];
+    while (x < 7) {
+      x++;
       if (board[x][y] == color) {
         position[0] = x;
         position[1] = y;
         return position;
       }
-      x++;
     }
     position[0] = EMPTY;
     return position;
   }
 
   protected int[] cChipsLeft (int color, int x, int y) {
-    int[] position;
-    while (x >= 0) {
+    int[] position = new int[2];
+    while (x > 0) {
+      x--;
       if (board[x][y] == color) {
         position[0] = x;
         position[1] = y;
         return position;
       }
-      x--;
     }
     position[0] = EMPTY;
     return position;
   }
 
   protected int[] cChipsDiagUpLeft (int color, int x, int y) {
-    int[] position;
-    while (y >= 0 && x >= 0) {
+    int[] position = new int[2];
+    while (y > 0 && x > 0) {
+      y--;
+      x--;
       if (board[x][y] == color) {
         position[0] = x;
         position[1] = y;
         return position;
       }
-      y--;
-      x--;
     }
   position[0] = EMPTY;
   return position;
   }
 
   protected int[] cChipsDiagUpRight (int color, int x, int y) {
-    int[] position;
-    while (y >= 0 && x <= 7) {
+    int[] position = new int[2];
+    while (y > 0 && x < 7) {
+      y--;
+      x++;
       if (board[x][y] == color) {
         position[0] = x;
         position[1] = y;
         return position;
       }
-      y--;
-      x++;
     }
   position[0] = EMPTY;
   return position;
   }
 
   protected int[] cChipsDiagDownLeft (int color, int x, int y) {
-    int[] position;
-    while (y <= 7 && x >= 0) {
+    int[] position = new int[2];
+    while (y < 7 && x > 0) {
+      y++;
+      x--;
       if (board[x][y] == color) {
         position[0] = x;
         position[1] = y;
         return position;
       }
-      y++;
-      x--;
     }
   position[0] = EMPTY;
   return position;
   }
 
   protected int[] cChipsDiagDownRight (int color, int x, int y) {
-    int[] position;
-    while (y <= 7 && x <= 7) {
+    int[] position = new int[2];
+    while (y < 7 && x < 7) {
+      y++;
+      x++;
       if (board[x][y] == color) {
         position[0] = x;
         position[1] = y;
         return position;
       }
-      y++;
-      x++;
     }
   position[0] = EMPTY;
   return position;
@@ -263,28 +280,28 @@ public void makeMove (int color, Move m) {
   protected int[][] connectedChips(int color, int x, int y) {
     int[][] connected = new int[8][];
     if (cChipsUp(color, x, y) != null) {
-      connected[0] = cChipsLeft(color, x, y);
+      connected[0] = cChipsUp(color, x, y);
     }
     if (cChipsDiagUpRight(color, x, y) != null) {
-      connected[1] = cChipsLeft(color, x, y);
+      connected[1] = cChipsDiagUpRight(color, x, y);
     }
     if (cChipsRight(color, x, y) != null) {
-      connected[2] = cChipsLeft(color, x, y);
+      connected[2] = cChipsRight(color, x, y);
     }
     if (cChipsDiagDownRight(color, x, y) != null) {
-      connected[3] = cChipsLeft(color, x, y);
+      connected[3] = cChipsDiagDownRight(color, x, y);
     }
     if (cChipsDown(color, x, y) != null) {
-      connected[4] = cChipsLeft(color, x, y);
+      connected[4] = cChipsDown(color, x, y);
     }
     if (cChipsDiagDownLeft(color, x, y) != null) {
-      connected[5] = cChipsLeft(color, x, y);
+      connected[5] = cChipsDiagDownLeft(color, x, y);
     }
     if (cChipsLeft(color, x, y) != null) {
       connected[6] = cChipsLeft(color, x, y);
     }
     if (cChipsDiagUpLeft(color, x, y) != null) {
-      connected[7] = cChipsLeft(color, x, y);
+      connected[7] = cChipsDiagUpLeft(color, x, y);
     }
     return connected;
   }
@@ -363,10 +380,14 @@ public void makeMove (int color, Move m) {
   
 
 public boolean network(int color, int x, int y, int[][] checked, int total, int directionFrom) {
-	if (total == 0 && !inGoals(color)) {
+	if (x == 0 && y == 0 && total == 0 && !inGoals(color)) {
 		return false;
 	}
 	if (total >= 5 && inWinningGoal(color, x, y)) {
+		System.out.println("beginning input " + x +" " + y);
+		for (int i[] : checked) {
+				System.out.println("x,y: " + i[0] + " " + i[1]);
+			}
 		hasNetwork = true;
 	}
 	if (color == BLACK) {
@@ -375,10 +396,11 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 		//from which to test for a network.	
 			for (int column = 1; column < 7; column++) {
 				if (board[column][0] == color) {
-					int[][] newChecked;
-					newChecked[total][0] = column;
-					newChecked[total][1] = 0;
-					network(color, column, 0, newChecked, total++, EMPTY);				
+					int[][] newChecked = new int[10][2];
+					newChecked[0][0] = column;
+					newChecked[0][1] = 0;
+					total++;
+					network(color, column, 0, newChecked, total, EMPTY);				
 				}
 			}
 		} else {
@@ -408,9 +430,13 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 					//Create a pointer array to the checked array called current, allowing modification of an array that will be 
 					//called in Network().
 					int[][] current = checked;
+					for (int i[] : connected) {
+						System.out.println("CONNECTED for " + x + " " + y + " x,y: " + i[0] + " " + i[1]);
+					}
 					current[total][0] = connected[index][0];
 					current[total][1] = connected[index][1];
-					network(color, connected[index][0], connected[index][1], current, total++, index);
+					total++;
+					network(color, connected[index][0], connected[index][1], current, total, index);
 				}
 			}
 		}
@@ -420,10 +446,11 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 		//from which to test for a network.	
 			for (int row = 1; row < 7; row++) {
 				if (board[0][row] == color) {
-					int[][] newChecked;
-					newChecked[total][0] = 0;
-					newChecked[total][1] = row;
-					network(color, 0, row, newChecked, total++, EMPTY);				
+					int[][] newChecked = new int[10][2];
+					newChecked[0][0] = 0;
+					newChecked[0][1] = row;
+					total++;
+					network(color, 0, row, newChecked, total, EMPTY);				
 				}
 			}
 		} else {
@@ -455,7 +482,8 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 					int[][] current = checked;
 					current[total][0] = connected[index][0];
 					current[total][1] = connected[index][1];
-					network(color, connected[index][0], connected[index][1], current, total++, index);
+					total++;
+					network(color, connected[index][0], connected[index][1], current, total, index);
 				}
 			}
 		}
