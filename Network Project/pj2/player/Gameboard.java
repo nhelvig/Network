@@ -371,7 +371,11 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 	return hasNetwork;
 	}
   
-   public boolean isValid (Move m, int color) {
+    public boolean isValid (Move m, int color) {
+        Gameboard test = new GameBoard ();
+        test.pieces = this.pieces;
+
+
         //No chip may be placed in any of the four corners
         if ((m.x1 == 0 && m.y1 == 0) || (m.x1 == 0 && m.y1 == 7) || (m.x1 == 7 && m.y1 == 0) || (m.x1 == 7 && m.y1 == 7))
             return false;
@@ -383,8 +387,11 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
             return false
 
 	//No chip may be placed in a square that is already occupied
-      	if (pieces [m.x1][m.y1] != EMPTY)
+      	if (test.pieces [m.x1][m.y1] != EMPTY)
             return false;
+
+        if (m.moveKind == STEP)
+       	    test.pieces [m.x2][my.y2] = EMPTY;
 
 	//A player may not have more than two chips in a connected group, whether connected orthogonally or diagonally
         int [] adjacentPiece = checkAround (m.x1, m.y1);
@@ -393,14 +400,14 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
         if (adjacentPiece [0] == -2 && adjacentPiece[1] == -2)
             return false;
         
-        adjacentPiece = checkAround (adjacentPiece[0], adjacentPiece[1]);
+        adjacentPiece = checkAround (test, adjacentPiece[0], adjacentPiece[1]);
         if (adjacentPiece [0] == -1 && adjacentPiece[1] == -1)
             return true;
 
         return false;
     }
 
-    private int [] checkAround (int x, int y) {
+    private int [] checkAround (GameBoard test, int x, int y) {
 	int [] position = new int [2];
         position [0] = -1;
         position [1] = -1;
@@ -427,7 +434,7 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
                     continue;
 
                 
-                if (pieces[x+i][y+j] != EMPTY) {
+                if (test.pieces[x+i][y+j] != EMPTY) {
                     position[0] = x + i;
                     position[1] = y + j;
                     count ++;
