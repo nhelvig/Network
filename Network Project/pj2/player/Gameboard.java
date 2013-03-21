@@ -1,17 +1,109 @@
 //Hello!!!!!!
 public class Gameboard {
 
-
+    public int [][] pieces;
+    public final int WHITE = 1;
+    public final int BLACK = 0;
+    public final int EMPTY = 2;
+    public final int ADD = 1;
+    public final int STEP = 2;
+    
+    
 	private int[][] board;
 	private final int EMPTY = -1;
 	final int WHITE = 1;
   	final int BLACK = 2;
   	private boolean hasNetwork;
+  	
+    public GameBoard () {
+        pieces = new int [8][8];
+    }
 
 	public Gameboard() {
 		board = new int[8][8];
 		hasNetwork = false;
 	}
+	
+  public void initializeBoard () {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; i < 8; i++) {
+                pieces [i][j] = EMPTY;
+	    }
+	}
+    }
+    
+public void makeMove (int color, Move m) {
+        if (m.moveKind == ADD) {
+            pieces [m.x1][m.y1] = color;
+	}
+        if (m.moveKind == STEP) {
+            pieces [m.x2][m.y2] = EMPTY;
+            pieces [m.x1][m.y1] = color;
+	}    
+    }
+
+    public void undoMove (int color, Move m) {
+        if (m.moveKind == ADD) {
+            pieces[m.x1][m.y1] = EMPTY;
+	}
+        if (m.moveKind == STEP) {
+            pieces[m.x2][m.y2] = pieces[m.x1][m.y1];
+            pieces[m.x1][m.y1] = EMPTY;
+	}
+    }
+    
+    public int evaluateBoard () {
+        
+    }
+
+    public Best returnBest (int side, int searchdepth, int alpha, int beta) {
+        final int COMPUTER = side; 
+        final int HUMAN = switchSide(side);
+        Best myBest = new Best();
+        Best reply;
+        Move [] legalmoves = validMoves ();
+        int i = 0;
+
+        if (evaluateBoard() > 1000 || evaluateBoard() < -1000 || searchdepth == 0) {
+            myBest.score = evaluateBoard();
+            return myBest;
+	}
+        if (side == COMPUTER) {
+            myBest.score = alpha;
+	} 
+        else {
+            myBest.score = beta;
+	}
+
+        while (legalmoves[i] != null) {
+            makeMove (side, legalmoves[i]);
+            reply = returnBest (switchSide(side), searchdepth - 1, alpha, beta);
+            undoMove (side, legalmoves[i]);
+            if ((side == COMPUTER) && (reply.score >= myBest.score)) {
+                myBest.move = legalmoves[i];
+                myBest.score = reply.score;
+                alpha = reply.score;
+	    } 
+            else if ((side == HUMAN)) && (reply.score <= myBest.score)) {
+	        myBest.move = legalmoves[i];
+                myBest.score = reply.score;
+                beta = reply.score;
+	    }
+	    if (alpha >= beta) {
+                return myBest;
+	    }
+            i++;
+	}
+        return myBest;
+    }
+
+    public int switchSide (int side) {
+        if (side == WHITE)
+            side = BLACK;
+        if (side == BLACK)
+            side = WHITE;
+        return side;
+    }
 
   // Implemented by Nick
   // validMoves generates a list of all possible moves by going through each space of
