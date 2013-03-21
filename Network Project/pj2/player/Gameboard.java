@@ -1,59 +1,52 @@
+
+
 //Hello!!!!!!
 public class Gameboard {
 
-    public int [][] pieces;
-    public final int WHITE = 1;
-    public final int BLACK = 0;
-    public final int EMPTY = 2;
-    public final int ADD = 1;
+
+	public int[][] board;
+	private static final int EMPTY = -1;
+	private static final int WHITE = 1;
+  	private static final int BLACK = 2;
+  	public final int ADD = 1;
     public final int STEP = 2;
-    
-    
-	private int[][] board;
-	private final int EMPTY = -1;
-	final int WHITE = 1;
-  	final int BLACK = 2;
   	private boolean hasNetwork;
-  	
-    public GameBoard () {
-        pieces = new int [8][8];
-    }
 
 	public Gameboard() {
 		board = new int[8][8];
 		hasNetwork = false;
 	}
-	
-  public void initializeBoard () {
+
+	public void initializeBoard () {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; i < 8; i++) {
-                pieces [i][j] = EMPTY;
-	    }
-	}
+                board[i][j] = EMPTY;
+	    	}
+		}
     }
-    
-public void makeMove (int color, Move m) {
+
+    public void makeMove (int color, Move m) {
         if (m.moveKind == ADD) {
-            pieces [m.x1][m.y1] = color;
+            board[m.x1][m.y1] = color;
 	}
         if (m.moveKind == STEP) {
-            pieces [m.x2][m.y2] = EMPTY;
-            pieces [m.x1][m.y1] = color;
-	}    
+            board[m.x2][m.y2] = EMPTY;
+            board[m.x1][m.y1] = color;
+		}    
     }
 
     public void undoMove (int color, Move m) {
         if (m.moveKind == ADD) {
-            pieces[m.x1][m.y1] = EMPTY;
-	}
+            board[m.x1][m.y1] = EMPTY;
+		}
         if (m.moveKind == STEP) {
-            pieces[m.x2][m.y2] = pieces[m.x1][m.y1];
-            pieces[m.x1][m.y1] = EMPTY;
-	}
+            board[m.x2][m.y2] = board[m.x1][m.y1];
+            board[m.x1][m.y1] = EMPTY;
+		}
     }
     
     public int evaluateBoard () {
-        
+        return 0;
     }
 
     public Best returnBest (int side, int searchdepth, int alpha, int beta) {
@@ -61,7 +54,7 @@ public void makeMove (int color, Move m) {
         final int HUMAN = switchSide(side);
         Best myBest = new Best();
         Best reply;
-        Move [] legalmoves = validMoves ();
+        Move [] legalmoves = validMoves (side);
         int i = 0;
 
         if (evaluateBoard() > 1000 || evaluateBoard() < -1000 || searchdepth == 0) {
@@ -84,7 +77,7 @@ public void makeMove (int color, Move m) {
                 myBest.score = reply.score;
                 alpha = reply.score;
 	    } 
-            else if ((side == HUMAN)) && (reply.score <= myBest.score)) {
+            else if ((side == HUMAN) && (reply.score <= myBest.score)) {
 	        myBest.move = legalmoves[i];
                 myBest.score = reply.score;
                 beta = reply.score;
@@ -104,23 +97,6 @@ public void makeMove (int color, Move m) {
             side = WHITE;
         return side;
     }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-
-//Hello!!!!!!
-public class Gameboard {
-
-
-	public int[][] board;
-	private static final int EMPTY = -1;
-	private static final int WHITE = 1;
-  	private static final int BLACK = 2;
-  	private boolean hasNetwork;
-
-	public Gameboard() {
-		board = new int[8][8];
-		hasNetwork = false;
-	}
 
   // Implemented by Nick
   // validMoves generates a list of all possible moves by going through each space of
@@ -492,8 +468,8 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 	}
   
     public boolean isValid (Move m, int color) {
-        Gameboard test = new GameBoard ();
-        test.pieces = this.pieces;
+        Gameboard test = new Gameboard ();
+        test.board = this.board;
 
 
         //No chip may be placed in any of the four corners
@@ -502,19 +478,19 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 
         //No chip may be placed in a goal of the opposite color
         if ((color == WHITE) && (m.y1 == 0 || m.y1 == 7)) 
-            return false
+            return false;
         if ((color == BLACK) && (m.x1 == 0 || m.x1 == 7)) 
-            return false
+            return false;
 
 	//No chip may be placed in a square that is already occupied
-      	if (test.pieces [m.x1][m.y1] != EMPTY)
+      	if (test.board [m.x1][m.y1] != EMPTY)
             return false;
 
         if (m.moveKind == STEP)
-       	    test.pieces [m.x2][my.y2] = EMPTY;
+       	    test.board [m.x2][m.y2] = EMPTY;
 
 	//A player may not have more than two chips in a connected group, whether connected orthogonally or diagonally
-        int [] adjacentPiece = checkAround (m.x1, m.y1);
+        int [] adjacentPiece = checkAround (test, m.x1, m.y1);
         if (adjacentPiece [0] == -1 && adjacentPiece[1] == -1)
             return true;
         if (adjacentPiece [0] == -2 && adjacentPiece[1] == -2)
@@ -527,13 +503,13 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
         return false;
     }
 
-    private int [] checkAround (GameBoard test, int x, int y) {
+    private int [] checkAround (Gameboard test, int x, int y) {
 	int [] position = new int [2];
         position [0] = -1;
         position [1] = -1;
         int count = 0;
 
-	// Check all around position for pieces
+	// Check all around position for board
 	for (int i = -1; i <= 1; i++) {
 	    //Left border case
             if (x == 0)
@@ -541,7 +517,7 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
             //Right border case
             if (x == 7 && i == 1) 
                 continue;
-	    
+
             for (int j = -1; j <= 1; j++) {
                 //Don't return starting position
                 if (i == 0 && j == 0) 
@@ -554,7 +530,7 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
                     continue;
 
                 
-                if (test.pieces[x+i][y+j] != EMPTY) {
+                if (test.board[x+i][y+j] != EMPTY) {
                     position[0] = x + i;
                     position[1] = y + j;
                     count ++;
@@ -570,5 +546,4 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 
         return position;
     }
-
 }
