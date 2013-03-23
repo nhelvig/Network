@@ -1,5 +1,4 @@
 
-
 //Hello!!!!!!
 public class Gameboard {
 
@@ -359,11 +358,7 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 	if (x == 0 && y == 0 && total == 0 && !inGoals(color)) {
 		return false;
 	}
-	if (total >= 5 && inWinningGoal(color, x, y)) {
-		System.out.println("beginning input " + x +" " + y);
-		for (int i[] : checked) {
-				System.out.println("x,y: " + i[0] + " " + i[1]);
-			}
+	if (total > 5 && inWinningGoal(color, x, y)) {
 		hasNetwork = true;
 	}
 	if (color == BLACK) {
@@ -375,47 +370,12 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 					int[][] newChecked = new int[10][2];
 					newChecked[0][0] = column;
 					newChecked[0][1] = 0;
-					total++;
-					network(color, column, 0, newChecked, total, EMPTY);				
+					network(color, column, 0, newChecked, total + 1, EMPTY);				
 				}
 			}
 		} else {
-			//Make a list of all chip positions connected to this position.
-			int[][] connected = connectedChips(color, x, y);
-			//To avoid making a connection of 3+ chips in a row, do not search in the same direction.
-			if (directionFrom != EMPTY) {
-				connected[directionFrom][0] = EMPTY;
-			}
-			for (int index = 0; index < connected.length; index++) {
-				//If any chips in the connected list are the same as any in the list that has already been checked,
-				//or if a connected chip is in the starting goal, delete that chip from the list of connected chips.
-				for (int checkIndex = 0; checkIndex < checked.length; checkIndex++) {
-					if (connected[index][0] != EMPTY){
-						int connectedX = connected[index][0];
-						int connectedY = connected[index][1];
-						int checkedX = checked[checkIndex][0];
-						int checkedY = checked[checkIndex][1];
-						if (connectedX == checkedX && connectedY == checkedY || inStartingGoal(color, connectedX, connectedY)) {
-							connected[index][0] = EMPTY;
-						}
-					}
+      checkConnected(color, x, y, checked, total, directionFrom);
 				}
-				//With a now valid list of connected chips, call Network() on each of the connected chips, with directionFrom
-				//being the indexed position of connected.
-				if (connected[index][0] != EMPTY) {
-					//Create a pointer array to the checked array called current, allowing modification of an array that will be 
-					//called in Network().
-					int[][] current = checked;
-					for (int i[] : connected) {
-						System.out.println("CONNECTED for " + x + " " + y + " x,y: " + i[0] + " " + i[1]);
-					}
-					current[total][0] = connected[index][0];
-					current[total][1] = connected[index][1];
-					total++;
-					network(color, connected[index][0], connected[index][1], current, total, index);
-				}
-			}
-		}
 	} else if (color == WHITE) {
 		if (total == 0) {
 		//Iterate through all of the starting goal spaces to find a chip in the goal
@@ -425,47 +385,51 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 					int[][] newChecked = new int[10][2];
 					newChecked[0][0] = 0;
 					newChecked[0][1] = row;
-					total++;
-					network(color, 0, row, newChecked, total, EMPTY);				
+					network(color, 0, row, newChecked, total + 1, EMPTY);				
 				}
 			}
 		} else {
-			//Make a list of all chip positions connected to this position.
-			int[][] connected = connectedChips(color, x, y);
-			//To avoid making a connection of 3+ chips in a row, do not search in the same direction.
-			if (directionFrom != EMPTY) {
-				connected[directionFrom][0] = EMPTY;
-			}
-			for (int index = 0; index < connected.length; index++) {
-				//If any chips in the connected list are the same as any in the list that has already been checked,
-				//or if a connected chip is in the starting goal, delete that chip from the list of connected chips.
-				for (int checkIndex = 0; checkIndex < checked.length; checkIndex++) {
-					if (connected[index][0] != EMPTY ){
-						int connectedX = connected[index][0];
-						int connectedY = connected[index][1];
-						int checkedX = checked[checkIndex][0];
-						int checkedY = checked[checkIndex][1];
-						if (connectedX == checkedX && connectedY == checkedY || inStartingGoal(color, connectedX, connectedY)) {
-							connected[index][0] = EMPTY;
-						}
-					}
-				}
-				//With a now valid list of connected chips, call Network() on each of the connected chips, with directionFrom
-				//being the indexed position of connected.
-				if (connected[index][0] != EMPTY) {
-					//Create a pointer array to the checked array called current, allowing modification of an array that will be 
-					//called in Network().
-					int[][] current = checked;
-					current[total][0] = connected[index][0];
-					current[total][1] = connected[index][1];
-					total++;
-					network(color, connected[index][0], connected[index][1], current, total, index);
-				}
-			}
-		}
+			checkConnected(color, x, y, checked, total, directionFrom);
+      }
 	}
 	return hasNetwork;
 	}
+
+  private void checkConnected(int color, int x, int y, int[][] checked, int total, int directionFrom) {
+    //Make a list of all chip positions connected to this position.
+    int[][] connected = connectedChips(color, x, y);
+    //To avoid making a connection of 3+ chips in a row, do not search in the same direction.
+    if (directionFrom != EMPTY) {
+      connected[directionFrom][0] = EMPTY;
+    }
+    for (int index = 0; index < connected.length; index++) {
+      //If any chips in the connected list are the same as any in the list that has already been checked,
+      //or if a connected chip is in the starting goal, delete that chip from the list of connected chips.
+      for (int checkIndex = 0; checkIndex < checked.length; checkIndex++) {
+        if (connected[index][0] != EMPTY){
+          int connectedX = connected[index][0];
+          int connectedY = connected[index][1];
+          int checkedX = checked[checkIndex][0];
+          int checkedY = checked[checkIndex][1];
+          if (connectedX == checkedX && connectedY == checkedY || inStartingGoal(color, connectedX, connectedY)) {
+            connected[index][0] = EMPTY;
+          }
+        }
+      }
+    }
+      //With a now valid list of connected chips, call Network() on each of the connected chips, with directionFrom
+      //being the indexed position of connected.
+    for (int index = 0; index < connected.length; index++) {
+      if (connected[index][0] != EMPTY) {
+        //Create a pointer array to the checked array called current, allowing modification of an array that will be 
+        //called in Network().
+        int[][] current = checked;
+        current[total][0] = connected[index][0];
+        current[total][1] = connected[index][1];
+        network(color, connected[index][0], connected[index][1], current, total + 1, index);
+      }
+    }
+  }
   
     public boolean isValid (Move m, int color) {
         Gameboard test = new Gameboard ();
