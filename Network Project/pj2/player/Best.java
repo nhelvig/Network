@@ -1,3 +1,4 @@
+package player;
 public class Best {
     public Move move;
     public int score;    
@@ -5,6 +6,7 @@ public class Best {
     public Best () {
         move = new Move();
     }
+
 
 
 }
