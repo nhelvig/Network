@@ -63,15 +63,20 @@ public class Gameboard {
  
               
     }
-
+    int COMPUTER;
+    int HUMAN;
+    boolean called = false;
     public Best returnBest (int side, int searchdepth, int alpha, int beta) {
-        //System.out.println ("called");
-        final int COMPUTER = side; 
-        final int HUMAN = switchSide(side);
+        //System.out.println ("called"); 
+        if (!called) {
+            COMPUTER = side;
+            HUMAN = switchSide(side);
+            called = true;
+	}
         Best myBest = new Best();
         Best reply;
         Move [] legalmoves = validMoves (side);
-        myBest.move = legalmoves[0];
+        //myBest.move = legalmoves[0];
         int i = 0;
         /*while (legalmoves[i] != null) {
             System.out.println ("List of valid moves: ");
@@ -80,7 +85,7 @@ public class Gameboard {
 	}
         i = 0;*/
 
-        if (evaluateBoard(side) > 1000 || evaluateBoard(side) < -1000 || searchdepth == 0) {
+        if (evaluateBoard(side) > 1000 || searchdepth == 0) {
             myBest.score = evaluateBoard(side);
             return myBest;
 	}
@@ -98,16 +103,16 @@ public class Gameboard {
             if ((side == COMPUTER) && (reply.score >= myBest.score)) {
                 myBest.move = legalmoves[i];
                 myBest.score = reply.score;
-                alpha = reply.score;
+                //alpha = reply.score;
 	    } 
             else if ((side == HUMAN) && (reply.score <= myBest.score)) {
 	        myBest.move = legalmoves[i];
                 myBest.score = reply.score;
-                beta = reply.score;
+                //beta = reply.score;
 	    }
-	    if (alpha >= beta) {
+	    /*if (alpha >= beta) {
                 return myBest;
-	    }
+		}*/
             i++;
 	}
         return myBest;
