@@ -12,6 +12,9 @@ public class MachinePlayer extends Player {
     final int BLACK = 2;
     final int WHITE = 1;
     final int EMPTY = -1;
+    public final static int QUIT = 0;
+    public final static int ADD = 1;
+    public final static int STEP = 2;
     int side;
     int depth;
     Gameboard myboard;
@@ -48,9 +51,11 @@ public class MachinePlayer extends Player {
   // Returns a new move by "this" player.  Internally records the move (updates
   // the internal game board) as a move by "this" player.
   public Move chooseMove() {
-      Best myBest = myboard.returnBest(side, 2, -10000, 10000);
+      Best myBest = myboard.returnBest(side, 3, -10000, 10000);
       Move bestmove = myBest.move;
-      myboard.makeMove(side, bestmove);
+      if (bestmove.moveKind != QUIT) {
+          myboard.makeMove(side, bestmove);
+      }
       return bestmove;
   } 
 
