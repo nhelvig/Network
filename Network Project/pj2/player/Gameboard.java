@@ -157,7 +157,7 @@ public class Gameboard {
        @param color       the color for which the list of moves is to be generated 
        @return            returns an array of valid moves */
     protected Move[] validMoves(int color) {
-        System.out.println("white: " + numWhiteChips);
+      //  System.out.println("white: " + numWhiteChips);
         Move[] valids = new Move[770];
         int index = 0;
         for (int x = 0; x < 8; x++) {
