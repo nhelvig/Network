@@ -547,6 +547,8 @@ public class Gameboard {
 
         if (m.moveKind == ADD && numChips >= 20) 
             return false;
+        if (m.moveKind == STEP && m.x1 == m.x2 && m.y1 == m.y2)
+            return false;
 
         //No chip may be placed in any of the four corners
         if ((m.x1 == 0 && m.y1 == 0) || (m.x1 == 0 && m.y1 == 7) || (m.x1 == 7 && m.y1 == 0) || (m.x1 == 7 && m.y1 == 7))
