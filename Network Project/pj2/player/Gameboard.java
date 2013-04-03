@@ -104,11 +104,11 @@ public class Gameboard {
             return myBest;
   }
         if (side == COMPUTER) {
-            myBest.score = alpha;
-  } 
+            myBest.score = -10000;
+    } 
         else {
-            myBest.score = beta;
-  }
+            myBest.score = 10000;
+	}
 
         while (legalmoves[i] != null) {
             makeMove (side, legalmoves[i]);
