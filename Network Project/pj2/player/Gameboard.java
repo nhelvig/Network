@@ -1,5 +1,4 @@
 package player;
-
 public class Gameboard {
     public int[][] board;
     private static final int EMPTY = -1;
@@ -8,75 +7,65 @@ public class Gameboard {
     public final int ADD = 1;
     public final int STEP = 2;
     private boolean hasNetwork;
+    private boolean isFull;
     private int numChips;
-    private int numWhiteChips;
-    private int numBlackChips;
 
     public Gameboard() {
-      board = new int[8][8];
-        hasNetwork = false;
+     	board = new int[8][8];
+       	hasNetwork = false;
     }
 
     public void initializeBoard () {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 board[i][j] = EMPTY;
-      }
-  }
+	    }
+	}
     }
 
     public void makeMove (int color, Move m) {
         if (m.moveKind == ADD) {
             board[m.x1][m.y1] = color;
-            if (color == WHITE) {
-              numWhiteChips += 1;
-            }
-            if (color == BLACK) {
-              numBlackChips += 1;
-            }
             numChips++;
-  }
+	}
         if (m.moveKind == STEP) {
             board[m.x2][m.y2] = EMPTY;
             board[m.x1][m.y1] = color;
-  }   
+	}   
     }
 
-    private void undoMove (int color, Move m) {
+    public void undoMove (int color, Move m) {
         if (m.moveKind == ADD) {
             board[m.x1][m.y1] = EMPTY;
-            if (color == WHITE) {
-              numWhiteChips -= 1;
-            }
-            if (color == BLACK) {
-              numBlackChips -= 1;
-            }
             numChips--;
-  }
+	}
         if (m.moveKind == STEP) {
             board[m.x2][m.y2] = board[m.x1][m.y1];
             board[m.x1][m.y1] = EMPTY;
-  }
+	}
     }
     
-    private int evaluateBoard (int side) {
-      int odds = 0;
-      int GOAL_BONUS = 10;
-      if (network(side, 0, 0, null, 0, 0)) {
-        odds += (10000 - numChips);
-      }
-      if (network(switchSide(side), 0, 0, null, 0, 0)) {
-        odds += (-10000 + numChips);
-      }
-       
-      odds += (findConnections (side) - (2 * findConnections (switchSide(side))));
-      if (inGoals (side)) {
-        odds += GOAL_BONUS;
-      }
-      return odds;        
+    public int evaluateBoard (int side) {
+        int odds = 0;
+        final int GOAL_BONUS = 10;
+        if (network(side, 0, 0, null, 0, 0)) {
+	    odds += (10000 - numChips);
+	    System.out.println ("Network found!");
+	}
+        else if (network(switchSide(side), 0, 0, null, 0, 0)) {
+            odds += -10000 + numChips;
+	}
+        else {
+            odds += (findConnections (side) - findConnections (switchSide(side)));
+	    if (inGoals (side)) {
+	        odds += GOAL_BONUS;
+	    }
+	}
+        
+        return odds;
+ 
+              
     }
-
-
     int COMPUTER;
     int HUMAN;
     boolean called = false;
@@ -85,8 +74,9 @@ public class Gameboard {
         if (!called) {
             COMPUTER = side;
             HUMAN = switchSide(side);
+            //System.out.println (COMPUTER);
             called = true;
-  }
+	}
         Best myBest = new Best();
         Best reply;
         Move [] legalmoves = validMoves (side);
@@ -96,39 +86,48 @@ public class Gameboard {
             System.out.println ("List of valid moves: ");
             System.out.println ("Move" + i + ": " + legalmoves[i].x1 + " " + legalmoves[i].y1);
             i++;
-  }*/
-        i = 0;
+	}
+        i = 0;*/
 
-        if (evaluateBoard(side) > 1000 || searchdepth == 0) {
-            myBest.score = evaluateBoard(side);
+        if (searchdepth == 0) {
+            myBest.score = evaluateBoard(COMPUTER);
+            //System.out.println ("Move " + myBest.move.x1 + " " + myBest.move.y1 + ": " + myBest.score);
             return myBest;
-  }
+	}
+        if (evaluateBoard (side) > 1000) {
+       	    myBest.score = evaluateBoard (COMPUTER);
+            //System.out.println ("Win detected: " + myBest.score);
+            return myBest;
+	}
         if (side == COMPUTER) {
-            myBest.score = -10000;
-    } 
+            myBest.score = -100000;
+	} 
         else {
-            myBest.score = 10000;
+            myBest.score = 100000;
 	}
 
         while (legalmoves[i] != null) {
             makeMove (side, legalmoves[i]);
             reply = returnBest (switchSide(side), searchdepth - 1, alpha, beta);
             undoMove (side, legalmoves[i]);
+
             if ((side == COMPUTER) && (reply.score >= myBest.score)) {
                 myBest.move = legalmoves[i];
                 myBest.score = reply.score;
-                //alpha = reply.score;
-      } 
+                alpha = reply.score;
+	    } 
+
             else if ((side == HUMAN) && (reply.score <= myBest.score)) {
-          myBest.move = legalmoves[i];
+	        myBest.move = legalmoves[i];
                 myBest.score = reply.score;
-                //beta = reply.score;
-      }
-      /*if (alpha >= beta) {
+                beta = reply.score;
+	    }
+
+	    if (alpha >= beta) {
                 return myBest;
-    }*/
+		}
             i++;
-  }
+	}
         return myBest;
     }
 
@@ -140,15 +139,6 @@ public class Gameboard {
         return EMPTY;
     }
 
-    private boolean tenChips(int color) {
-      if (color == WHITE) {
-        return numWhiteChips == 10;
-      }
-      if (color == BLACK) {
-        return numBlackChips == 10;
-      }
-      return false;
-    }
     /** Implemented by Nick
        validMoves generates a list of all possible moves by going through each space of
        the internal game board and checking whether or not that space is a valid space 
@@ -157,32 +147,32 @@ public class Gameboard {
        @param color       the color for which the list of moves is to be generated 
        @return            returns an array of valid moves */
     protected Move[] validMoves(int color) {
-      //  System.out.println("white: " + numWhiteChips);
-        Move[] valids = new Move[770];
+        Move[] valids = new Move[1000];
         int index = 0;
         for (int x = 0; x < 8; x++) {
-          for (int y = 0; y < 8; y++) {
-            if (tenChips(color)) {
-              if (board[x][y] == color) {
-                for (int x1 = 0; x1 < 8; x1++) {
-                  for (int y1 = 0; y1 < 8; y1++) {
-                    Move move = new Move(x1, y1, x, y);
-                    if (isValid (move, color)) {
-                    valids[index] = move;
-                    index++;
-                    }
-                  }
-                }
-              }
-            } else {
-              Move move = new Move(x,y);
-              if (isValid (move, color)) {
-                valids[index] = move;
-                index++;
-              }
+          for (int y = 0; y < 8; y++) { 
+            Move addmove = new Move(x,y);
+            if (isValid (addmove, color)) {
+              valids[index] = addmove;
+              index++;
             }
           }
-        } 
+        }
+        /*for (int x = 0; x < 8; x++) {
+          for (int y = 0; y < 8; y++) { 
+              if (board[x][y] == color) {
+                  for (int x2 = 0; x < 8; x++) {
+                      for (int y2 = 0; y < 8; y++) { 
+                          Move stepmove = new Move (x, y, x2, y2);
+                          if (isValid (stepmove, color)) {
+                              valids[index] = stepmove;
+                              index++;
+			  }
+		      }
+	          }
+	      }
+	  }
+	  } */
         return valids;
     }
 
@@ -312,7 +302,7 @@ public class Gameboard {
         return position;
     }
     
-    /*
+    /**
     findConnections counts the number of chip connections on a certain board for a 
     certain color. 
     @param color             the color of the connections to be counted
@@ -326,13 +316,13 @@ public class Gameboard {
             for (int y = 0; y < 8; y++) {
                 if (board[x][y] != color) {
                     continue;
-    }
+		}
                 if (x == 0 || x == 7) {
                     checkingWhiteGoal = true;
-    }
+		}
                 if (y == 0 || y == 7) {
                     checkingBlackGoal = true;
-    }
+		}
                 if (!checkingWhiteGoal && cChipsUp(color, x, y)[0] != EMPTY) {
                     connections++;
                 }
@@ -357,8 +347,8 @@ public class Gameboard {
                 if (cChipsDiagUpLeft(color, x, y)[0] != EMPTY) {
                     connections++;
                 }
-      }
-  }
+	    }
+	}
         
         return connections;
     }
@@ -372,14 +362,30 @@ public class Gameboard {
 
     protected int[][] connectedChips(int color, int x, int y) {
         int[][] connected = new int[8][];
-        connected[0] = cChipsUp(color, x, y);
-        connected[1] = cChipsDiagUpRight(color, x, y);
-        connected[2] = cChipsRight(color, x, y);
-        connected[3] = cChipsDiagDownRight(color, x, y);
-        connected[4] = cChipsDown(color, x, y);
-        connected[5] = cChipsDiagDownLeft(color, x, y);
-        connected[6] = cChipsLeft(color, x, y);
-        connected[7] = cChipsDiagUpLeft(color, x, y);
+        if (cChipsUp(color, x, y) != null) {
+            connected[0] = cChipsUp(color, x, y);
+        }
+        if (cChipsDiagUpRight(color, x, y) != null) {
+             connected[1] = cChipsDiagUpRight(color, x, y);
+        }
+        if (cChipsRight(color, x, y) != null) {
+            connected[2] = cChipsRight(color, x, y);
+        }
+        if (cChipsDiagDownRight(color, x, y) != null) {
+            connected[3] = cChipsDiagDownRight(color, x, y);
+        }
+        if (cChipsDown(color, x, y) != null) {
+            connected[4] = cChipsDown(color, x, y);
+        }
+        if (cChipsDiagDownLeft(color, x, y) != null) {
+            connected[5] = cChipsDiagDownLeft(color, x, y);
+        }
+        if (cChipsLeft(color, x, y) != null) {
+            connected[6] = cChipsLeft(color, x, y);
+        }
+        if (cChipsDiagUpLeft(color, x, y) != null) {
+            connected[7] = cChipsDiagUpLeft(color, x, y);
+        }
         return connected;
     }
 
@@ -393,26 +399,26 @@ public class Gameboard {
                                       false if the chip is not in the player's goal area          */
     public boolean inGoals(int color) {
         boolean goal1 = false;
-    boolean goal2 = false;
+  	boolean goal2 = false;
         if (color == WHITE) {
-      for (int y = 1; y < 7; y++) {
-          if (board[0][y] == WHITE) {
+	    for (int y = 1; y < 7; y++) {
+	        if (board[0][y] == WHITE) {
                     goal1 = true;
                 }
                 if (board[7][y] == WHITE) {    
                     goal2 = true;
                 }
-      }
-  } 
+	    }
+	} 
         else if (color == BLACK) {
-      for (int x = 1; x < 7; x++) {
-          if (board[x][0] == BLACK) {
+	    for (int x = 1; x < 7; x++) {
+	        if (board[x][0] == BLACK) {
                     goal1 = true;
                 }
                 if (board[x][7] == BLACK) {
                     goal2 = true;
                 }
-      }
+	    }
         }
         return goal1 && goal2;
     }
@@ -422,23 +428,23 @@ public class Gameboard {
       or right side. */
     private boolean inWinningGoal(int color, int x, int y) {
         if (color == WHITE) {
-        return x == 7;
-    } 
+  	    return x == 7;
+  	} 
         else if (color == BLACK) {
-        return y == 7;
-    }
-    return false;
+  	    return y == 7;
+  	}
+  	return false;
     }
 
     /**Checks to see if a given chip is in the starting goal of a board. The starting goal is the top of
        the board for BLACK and the left side for WHITE. This is called during Network(). */
     private boolean inStartingGoal(int color, int x, int y) {
-    if (color == WHITE) {
-        return x == 0;
-    } else if (color == BLACK) {
-        return y == 0;
-    }
-    return false;
+  	if (color == WHITE) {
+  	    return x == 0;
+  	} else if (color == BLACK) {
+  	    return y == 0;
+  	}
+  	return false;
     }
     /**Implemented by Nick
        network() evaluates a board and check's each chips list of connections to see if 
@@ -464,45 +470,45 @@ public class Gameboard {
   
 
     public boolean network(int color, int x, int y, int[][] checked, int total, int directionFrom) {
-  if (x == 0 && y == 0 && total == 0 && !inGoals(color)) {
-    return false;
-  }
-  if (total > 5 && inWinningGoal(color, x, y)) {
-    hasNetwork = true;
-  }
-  if (color == BLACK) {
-    if (total == 0) {
-    //Iterate through all of the starting goal spaces to find a chip in the goal
-    //from which to test for a network. 
-      for (int column = 1; column < 7; column++) {
-        if (board[column][0] == color) {
-          int[][] newChecked = new int[10][2];
-          newChecked[0][0] = column;
-          newChecked[0][1] = 0;
-          network(color, column, 0, newChecked, total + 1, EMPTY);        
-        }
-      }
-    } else {
+	if (x == 0 && y == 0 && total == 0 && !inGoals(color)) {
+		return false;
+	}
+	if (total > 5 && inWinningGoal(color, x, y)) {
+		hasNetwork = true;
+	}
+	if (color == BLACK) {
+		if (total == 0) {
+		//Iterate through all of the starting goal spaces to find a chip in the goal
+		//from which to test for a network.	
+			for (int column = 1; column < 7; column++) {
+				if (board[column][0] == color) {
+					int[][] newChecked = new int[10][2];
+					newChecked[0][0] = column;
+					newChecked[0][1] = 0;
+					network(color, column, 0, newChecked, total + 1, EMPTY);				
+				}
+			}
+		} else {
       checkConnected(color, x, y, checked, total, directionFrom);
-        }
-  } else if (color == WHITE) {
-    if (total == 0) {
-    //Iterate through all of the starting goal spaces to find a chip in the goal
-    //from which to test for a network. 
-      for (int row = 1; row < 7; row++) {
-        if (board[0][row] == color) {
-          int[][] newChecked = new int[10][2];
-          newChecked[0][0] = 0;
-          newChecked[0][1] = row;
-          network(color, 0, row, newChecked, total + 1, EMPTY);       
-        }
+				}
+	} else if (color == WHITE) {
+		if (total == 0) {
+		//Iterate through all of the starting goal spaces to find a chip in the goal
+		//from which to test for a network.	
+			for (int row = 1; row < 7; row++) {
+				if (board[0][row] == color) {
+					int[][] newChecked = new int[10][2];
+					newChecked[0][0] = 0;
+					newChecked[0][1] = row;
+					network(color, 0, row, newChecked, total + 1, EMPTY);				
+				}
+			}
+		} else {
+			checkConnected(color, x, y, checked, total, directionFrom);
       }
-    } else {
-      checkConnected(color, x, y, checked, total, directionFrom);
-      }
-  }
-  return hasNetwork;
-  }
+	}
+	return hasNetwork;
+	}
 
   private void checkConnected(int color, int x, int y, int[][] checked, int total, int directionFrom) {
     //Make a list of all chip positions connected to this position.
@@ -560,15 +566,15 @@ public class Gameboard {
         if ((color == BLACK) && (m.x1 == 0 || m.x1 == 7)) 
             return false;
 
-  //No chip may be placed in a square that is already occupied
-        if (test.board [m.x1][m.y1] != EMPTY) {
+	//No chip may be placed in a square that is already occupied
+      	if (test.board [m.x1][m.y1] != EMPTY) {
             return false;
-  }
+	}
 
         if (m.moveKind == STEP)
-            test.board [m.x2][m.y2] = EMPTY;
+       	    test.board [m.x2][m.y2] = EMPTY;
 
-  //A player may not have more than two chips in a connected group, whether connected orthogonally or diagonally
+	//A player may not have more than two chips in a connected group, whether connected orthogonally or diagonally
         int [] adjacentPiece = checkAround (test, m.x1, m.y1, color);
         //There's nothing around the piece, so move is valid
         if (adjacentPiece [0] == -1 && adjacentPiece[1] == -1)
@@ -576,20 +582,20 @@ public class Gameboard {
         //There is more than one piece adjacent to the location, so move is invalid
         if (adjacentPiece [0] == -2 && adjacentPiece[1] == -2) {
             return false;
-  }
+	}
         
         //Check around the adjacent piece's location
         adjacentPiece = checkAround (test, adjacentPiece[0], adjacentPiece[1], color);
         //If there is more than one piece around the adjacent piece, move is invalid
         if (adjacentPiece [0] == -2 && adjacentPiece[1] == -2) {
             return false;
-  }
+	}
 
         return true;
     }
 
     private int [] checkAround (Gameboard test, int x, int y, int color) {
-  int [] position = new int [2];
+	int [] position = new int [2];
         position [0] = -1;
         position [1] = -1;
         int count = 0;
@@ -599,7 +605,7 @@ public class Gameboard {
         int endj;
         
 
-  // Check all around position for board
+	// Check all around position for board
 
         //Top border case
         if (y == 0) {
@@ -607,7 +613,7 @@ public class Gameboard {
             endi = 1;
             begj = 0;
             endj = 1;
-  }
+	}
 
         //Bottom border case
         else if (y == 7) {
@@ -615,7 +621,7 @@ public class Gameboard {
             endi = 1;
             begj = -1;
             endj = 0;
-  }
+	}
 
         //Left border case
         else if (x == 0) {
@@ -623,7 +629,7 @@ public class Gameboard {
             endi = 1;
             begj = -1;
             endj = 1;
-  }
+	}
 
         //Right border case
         else if (x == 7) {
@@ -631,7 +637,7 @@ public class Gameboard {
             endi = 0;
             begj = -1;
             endj = 1;
-  }
+	}
         
         //Non-border case
         else {
@@ -639,7 +645,7 @@ public class Gameboard {
             endi = 1;
             begj = -1;
             endj = 1;
-  }
+	}
 
         for (int i = begi; i <= endi; i++) {
             for (int j = begj; j <= endj; j++) {
@@ -647,15 +653,16 @@ public class Gameboard {
                     position[0] = x + i;
                     position[1] = y + j;
                     count ++;
-    }   
-      }
-  }
+		}   
+	    }
+	}
       
         if (count > 1) {
             position [0] = -2;
             position [1] = -2;
-  }
+	}
 
         return position;
     }
+
 }
