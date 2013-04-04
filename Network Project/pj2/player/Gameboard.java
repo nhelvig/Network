@@ -186,13 +186,16 @@ public class Gameboard {
        @return           the coordinates of the closest chip of that color. 
                          if the closest chip is not of the same color, returns null */
 
-    protected int[] cChipsUp (int color, int x, int y) {
+protected int[] cChipsUp (int color, int x, int y) {
         int[] position = new int[2];
         while (y > 0) {
             y--;
             if (board[x][y] == color) {
                 position[0] = x;
                 position[1] = y;
+                return position;
+            } else if (board[x][y] == switchSide(color)) {
+                position[0] = EMPTY;
                 return position;
             }
         }
@@ -208,6 +211,9 @@ public class Gameboard {
                 position[0] = x;
                 position[1] = y;
                 return position;
+            } else if (board[x][y] == switchSide(color)) {
+                position[0] = EMPTY;
+                return position;
             }
         }
         position[0] = EMPTY;
@@ -222,6 +228,9 @@ public class Gameboard {
                 position[0] = x;
                 position[1] = y;
                 return position;
+            } else if (board[x][y] == switchSide(color)) {
+                position[0] = EMPTY;
+                return position;
             }
         }
         position[0] = EMPTY;
@@ -235,6 +244,9 @@ public class Gameboard {
             if (board[x][y] == color) {
                 position[0] = x;
                 position[1] = y;
+                return position;
+            } else if (board[x][y] == switchSide(color)) {
+                position[0] = EMPTY;
                 return position;
             }
         }
@@ -251,6 +263,9 @@ public class Gameboard {
                 position[0] = x;
                 position[1] = y;
                 return position;
+            } else if (board[x][y] == switchSide(color)) {
+                position[0] = EMPTY;
+                return position;
             }
         }
         position[0] = EMPTY;
@@ -265,6 +280,9 @@ public class Gameboard {
             if (board[x][y] == color) {
                 position[0] = x;
                 position[1] = y;
+                return position;
+            } else if (board[x][y] == switchSide(color)) {
+                position[0] = EMPTY;
                 return position;
             }
         }
@@ -281,6 +299,9 @@ public class Gameboard {
                 position[0] = x;
                 position[1] = y;
                 return position;
+            } else if (board[x][y] == switchSide(color)) {
+                position[0] = EMPTY;
+                return position;
             }
         }
         position[0] = EMPTY;
@@ -296,7 +317,10 @@ public class Gameboard {
                 position[0] = x;
                 position[1] = y;
                 return position;
-             }
+             } else if (board[x][y] == switchSide(color)) {
+                position[0] = EMPTY;
+                return position;
+            }
         }
         position[0] = EMPTY;
         return position;
