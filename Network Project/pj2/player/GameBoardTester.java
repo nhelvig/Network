@@ -21,7 +21,7 @@ public class GameBoardTester {
         System.out.println ("Testing corner rule...");
         if (board1.isValid (move1, WHITE)) {
             System.out.println ("Top left Corner rule test failed.");
-  }
+	}
         if (board1.isValid (move2, WHITE)) {
             System.out.println ("Top right corner rule test failed.");
 	}
@@ -64,6 +64,11 @@ public class GameBoardTester {
 	}
         if (!board1.isValid (move4, BLACK)) {
             System.out.println ("Rule 2 test failed. 8");
+	}
+        board1.makeMove (WHITE, new Move (3, 3));
+        move1 = new Move (3, 3, 3, 3);
+        if (board1.isValid (move1, WHITE)) {
+            System.out.println ("Replace rule failed.");
 	}
         
 
@@ -273,18 +278,48 @@ public class GameBoardTester {
         System.out.println ("Odds for white: " + board4.evaluateBoard(WHITE));
         System.out.println ("Odds for black: " + board4.evaluateBoard(BLACK));
        
-        //board4.makeMove (WHITE, new Move (7, 1));
+        board4.makeMove (WHITE, new Move (7, 1));
         System.out.println ("White player should win with 10000: " + board4.evaluateBoard(WHITE));
+        board4.undoMove (WHITE, new Move (7, 1));
+
+	//Testing undoMove
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                String character = "";
+                if (board4.board[j][i] == -1)
+                    character = "O";
+                if (board4.board[j][i] == 1)
+                    character = "W";
+                if (board4.board[j][i] == 2)
+                    character = "B";
+                System.out.print (character + "  ");
+	    }
+            System.out.println();
+	}
                 
  
 
         //Testing returnBest ...
         System.out.println ("Testing minimax search with alpha beta pruning...");
-        //board4.undoMove (WHITE, new Move (7, 1));
-        Best bestmove = board4.returnBest (WHITE, 3, -10000, 10000);
+        Best bestmove = board4.returnBest (WHITE, 1, -10000, 10000);
         System.out.println ("Best move should be (7, 1): " + bestmove.move.x1 + " " + bestmove.move.y1);
         board4.makeMove (WHITE, bestmove.move);
         System.out.println ("New score after best move for white: " + board4.evaluateBoard(WHITE));
+	for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                String character = "";
+                if (board4.board[j][i] == -1)
+                    character = "O";
+                if (board4.board[j][i] == 1)
+                    character = "W";
+                if (board4.board[j][i] == 2)
+                    character = "B";
+                System.out.print (character + "  ");
+	    }
+            System.out.println();
+	}
+
+        System.out.println ("Network returns " + board4.network(WHITE, 0, 0, null, 0, 0));
 
 
     }
