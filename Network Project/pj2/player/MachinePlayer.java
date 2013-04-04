@@ -51,11 +51,10 @@ public class MachinePlayer extends Player {
   // Returns a new move by "this" player.  Internally records the move (updates
   // the internal game board) as a move by "this" player.
   public Move chooseMove() {
-      Best myBest = myboard.returnBest(side, 3, -10000, 10000);
+      Best myBest = myboard.returnBest(side, 1, -10000, 10000);
       Move bestmove = myBest.move;
-      if (bestmove.moveKind != QUIT) {
-          myboard.makeMove(side, bestmove);
-      }
+      myboard.makeMove(side, bestmove);
+      //System.out.println ("Best: " + myBest.score);
       return bestmove;
   } 
 
