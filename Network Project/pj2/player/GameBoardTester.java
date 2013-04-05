@@ -296,7 +296,7 @@ public class GameBoardTester {
                 
         //Testing returnBest ...
         System.out.println ("Testing minimax search with alpha beta pruning...");
-        Best bestmove = board4.returnBest (WHITE, 1, -10000, 10000);
+        Best bestmove = board4.returnBest (WHITE, 4, -10000, 10000);
         System.out.println ("Best move should be (7, 1): " + bestmove.move.x1 + " " + bestmove.move.y1);
         board4.makeMove (WHITE, bestmove.move);
         /*Move testmove = new Move (7,6);
