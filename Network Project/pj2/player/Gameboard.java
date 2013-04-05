@@ -531,46 +531,49 @@ protected int[] cChipsUp (int color, int x, int y) {
        */
   
 
-    public boolean network(int color, int x, int y, int[][] checked, int total, int directionFrom) {
-	if (x == 0 && y == 0 && total == 0 && !inGoals(color)) {
-		return false;
-	}
-	if (total > 5 && inWinningGoal(color, x, y)) {
-		hasNetwork = true;
-	}
-	if (color == BLACK) {
-		if (total == 0) {
-		//Iterate through all of the starting goal spaces to find a chip in the goal
-		//from which to test for a network.	
-			for (int column = 1; column < 7; column++) {
-				if (board[column][0] == color) {
-					int[][] newChecked = new int[10][2];
-					newChecked[0][0] = column;
-					newChecked[0][1] = 0;
-					network(color, column, 0, newChecked, total + 1, EMPTY);				
-				}
-			}
-		} else {
-      checkConnected(color, x, y, checked, total, directionFrom);
-				}
-	} else if (color == WHITE) {
-		if (total == 0) {
-		//Iterate through all of the starting goal spaces to find a chip in the goal
-		//from which to test for a network.	
-			for (int row = 1; row < 7; row++) {
-				if (board[0][row] == color) {
-					int[][] newChecked = new int[10][2];
-					newChecked[0][0] = 0;
-					newChecked[0][1] = row;
-					network(color, 0, row, newChecked, total + 1, EMPTY);				
-				}
-			}
-		} else {
-			checkConnected(color, x, y, checked, total, directionFrom);
+        public boolean network(int color, int x, int y, int[][] checked, int total, int directionFrom) {
+  if (x == 0 && y == 0 && total == 0 && !inGoals(color)) {
+    return false;
+  }
+  if (total > 5 && inWinningGoal(color, x, y)) {
+    for (int i = 0; i < checked.length; i++) {
+      System.out.println("checked for " + x + " " + y + " is: " + checked[i][0] + " " + checked[i][1]);
+    }
+    hasNetwork = true;
+  }
+  if (color == BLACK) {
+    if (total == 0) {
+    //Iterate through all of the starting goal spaces to find a chip in the goal
+    //from which to test for a network. 
+      for (int column = 1; column < 7; column++) {
+        if (board[column][0] == color) {
+          int[][] newChecked = new int[10][2];
+          newChecked[0][0] = column;
+          newChecked[0][1] = 0;
+          network(color, column, 0, newChecked, total + 1, EMPTY);        
+        }
       }
-	}
-	return hasNetwork;
-	}
+    } else {
+      checkConnected(color, x, y, checked, total, directionFrom);
+        }
+  } else if (color == WHITE) {
+    if (total == 0) {
+    //Iterate through all of the starting goal spaces to find a chip in the goal
+    //from which to test for a network. 
+      for (int row = 1; row < 7; row++) {
+        if (board[0][row] == color) {
+          int[][] newChecked = new int[10][2];
+          newChecked[0][0] = 0;
+          newChecked[0][1] = row;
+          network(color, 0, row, newChecked, total + 1, EMPTY);       
+        }
+      }
+    } else {
+      checkConnected(color, x, y, checked, total, directionFrom);
+      }
+  }
+  return hasNetwork;
+  }
 
   private void checkConnected(int color, int x, int y, int[][] checked, int total, int directionFrom) {
     //Make a list of all chip positions connected to this position.
@@ -603,6 +606,9 @@ protected int[] cChipsUp (int color, int x, int y) {
         int[][] current = checked;
         current[total][0] = connected[index][0];
         current[total][1] = connected[index][1];
+        for (int i = total + 1; i < connected.length; i++) {
+          current[i][0] = EMPTY;
+        }
         network(color, connected[index][0], connected[index][1], current, total + 1, index);
       }
     }
