@@ -512,15 +512,19 @@ public class Gameboard {
        */
   
 
-    public boolean network(int color, int x, int y, int[][] checked, int total, int directionFrom) {
+public boolean network(int color, int x, int y, int[][] checked, int total, int directionFrom) {
   if (x == 0 && y == 0 && total == 0 && !inGoals(color)) {
     return false;
   }
   if (total > 5 && inWinningGoal(color, x, y)) {
+//    for (int i = 0; i < checked.length; i++) {
+  //    System.out.println(checked[i][0] + " " + checked[i][1]);
+    //}
     hasNetwork = true;
   }
   if (color == BLACK) {
     if (total == 0) {
+      grandTotal = 0;
     //Iterate through all of the starting goal spaces to find a chip in the goal
     //from which to test for a network. 
       for (int column = 1; column < 7; column++) {
@@ -532,10 +536,12 @@ public class Gameboard {
         }
       }
     } else {
+      grandTotal += total;
       checkConnected(color, x, y, checked, total, directionFrom);
         }
   } else if (color == WHITE) {
     if (total == 0) {
+      grandTotal = 0;
     //Iterate through all of the starting goal spaces to find a chip in the goal
     //from which to test for a network. 
       for (int row = 1; row < 7; row++) {
@@ -547,6 +553,7 @@ public class Gameboard {
         }
       }
     } else {
+      grandTotal += total;
       checkConnected(color, x, y, checked, total, directionFrom);
       }
   }
@@ -556,6 +563,9 @@ public class Gameboard {
   private void checkConnected(int color, int x, int y, int[][] checked, int total, int directionFrom) {
     //Make a list of all chip positions connected to this position.
     int[][] connected = connectedChips(color, x, y);
+ //   for (int i = 0; i < connected.length; i++) {
+   //   System.out.println("connected for " + x + "" + y + "is " + connected[i][0] + "" + connected[i][1]);
+   // }
     //To avoid making a connection of 3+ chips in a row, do not search in the same direction.
     if (directionFrom != EMPTY) {
       connected[directionFrom][0] = EMPTY;
@@ -572,6 +582,9 @@ public class Gameboard {
           if (connectedX == checkedX && connectedY == checkedY || inStartingGoal(color, connectedX, connectedY)) {
             connected[index][0] = EMPTY;
           }
+          if (inWinningGoal(color, checkedX, checkedY) && inWinningGoal(color, connectedX, connectedY)) {
+            connected[index][0] = EMPTY;
+          }
         }
       }
     }
@@ -582,17 +595,15 @@ public class Gameboard {
         //Create a pointer array to the checked array called current, allowing modification of an array that will be 
         //called in Network().
         int[][] current = checked;
+        for (int i = total; i < connected.length; i++) {
+          current[i][0] = EMPTY;
+        }
         current[total][0] = connected[index][0];
         current[total][1] = connected[index][1];
         if (total == 10) {
           total = 10;
-        } else {
-          total += 1;
         }
-        for (int i = total; i < connected.length; i++) {
-          current[i][0] = EMPTY;
-        }
-        network(color, connected[index][0], connected[index][1], current, total, index);
+        network(color, connected[index][0], connected[index][1], current, total + 1, index);
       }
     }
   }
