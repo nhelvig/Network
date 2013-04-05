@@ -212,8 +212,7 @@ public class Gameboard {
 	      }
 	  }
 	  } */
-        return valids;
-    }
+        
 
     /**Implemented by Nick
     These would be in MachinePlayer.java
