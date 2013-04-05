@@ -27,7 +27,8 @@ public class Gameboard {
     }
 
     public void makeMove (int color, Move m) {
-        if (m.moveKind == ADD) {
+   //     if (isValid(m, color)) {
+          if (m.moveKind == ADD) {
             board[m.x1][m.y1] = color;
             if (color == WHITE) {
               numWhiteChips += 1;
@@ -36,11 +37,12 @@ public class Gameboard {
               numBlackChips += 1;
             }
             numChips++;
-  }
-        if (m.moveKind == STEP) {
+          }
+          if (m.moveKind == STEP) {
             board[m.x2][m.y2] = EMPTY;
             board[m.x1][m.y1] = color;
-  }   
+          }
+   //     }
     }
 
     public void undoMove (int color, Move m) {
@@ -65,14 +67,18 @@ public class Gameboard {
       int odds = 0;
       int GOAL_BONUS = 10;
       if (network(COMPUTER, 0, 0, null, 0, 0)) {
-        odds =  10000;
+        odds = 10000;
       } else if (network(HUMAN, 0, 0, null, 0, 0)) {
-        odds =  -10000;
+        odds =  10000;
       } else if (inGoals (side)) {
         odds = GOAL_BONUS + (findConnections (side));
       } else {
         odds = findConnections (side);
       }
+      if (side == HUMAN){
+        odds = odds * (-1);
+      }
+      System.out.println("odds: " + odds);
       return odds;        
     }
 
@@ -80,7 +86,6 @@ public class Gameboard {
     int COMPUTER;
     int HUMAN;
     public Best returnBest (int side, int searchdepth, int alpha, int beta, boolean called) {
-        
         if (!called) {
             COMPUTER = side;
             HUMAN = switchSide(side);
@@ -89,15 +94,12 @@ public class Gameboard {
         Best myBest = new Best();
         Best reply;
         Move [] legalmoves = validMoves(side);
-        int i = 0;
         /*while (legalmoves[i] != null) {
             System.out.println ("List of valid moves: ");
             System.out.println ("Move" + i + ": " + legalmoves[i].x1 + " " + legalmoves[i].y1);
             i++;
   }*/
-        i = 0;
-
-        if (network(side, 0, 0, null, 0, 0) || searchdepth == 0) {
+        if (network(side, 0, 0, null, 0, 0) || network(switchSide(side), 0, 0, null, 0, 0) || searchdepth == 0) {
             Best thisBest = new Best();
             thisBest.score = evaluateBoard(side);
             return thisBest;
@@ -108,7 +110,7 @@ public class Gameboard {
         else {
             myBest.score = Integer.MAX_VALUE;
         }
-        while (legalmoves[i] != null) {
+        for (int i = 0; legalmoves[i] != null; i++) {
             makeMove (side, legalmoves[i]);
             reply = returnBest (switchSide(side), searchdepth - 1, alpha, beta, called);
             undoMove (side, legalmoves[i]);
@@ -165,13 +167,21 @@ public class Gameboard {
               if (board[x][y] == color) {
                 for (int x1 = 0; x1 < 8; x1++) {
                   for (int y1 = 0; y1 < 8; y1++) {
-                    Move move = new Move(x1, y1, x, y);
-                    if (isValid (move, color)) {
-                    valids[index] = move;
-                    index++;
+                    if (x1 != x && y1 != y) {
+                      board[x][y] = EMPTY;
+                      numChips--;
+                      Move move = new Move(x1, y1);
+                      //  System.out.println("x1: " + move.x1 + " y1: " + move.y1 + " to x2: " + move.x2 + " y2:" + move.y2);
+                      if (isValid (move, color)) {
+                        Move stepMove = new Move(x1, y1, x, y);
+                        valids[index] = stepMove;
+                        index++;
+                      }
                     }
                   }
                 }
+                board[x][y] = color;
+                numChips++;
               }
             } else {
               Move move = new Move(x,y);
@@ -182,11 +192,6 @@ public class Gameboard {
             }
           }
         } 
-        for (int i = 0; valids[i] != null; i++) {
-          if (valids[i].moveKind == STEP) {
-            System.out.println("step from: " + valids[i].x2 + " " + valids[i].y2 + " to " + valids[i].x1 + " " + valids[i].y1);
-          }
-        }
         return valids;
     }
 
@@ -563,10 +568,15 @@ public class Gameboard {
         int[][] current = checked;
         current[total][0] = connected[index][0];
         current[total][1] = connected[index][1];
-        for (int i = total + 1; i < connected.length; i++) {
+        if (total == 10) {
+          total = 10;
+        } else {
+          total += 1;
+        }
+        for (int i = total; i < connected.length; i++) {
           current[i][0] = EMPTY;
         }
-        network(color, connected[index][0], connected[index][1], current, total + 1, index);
+        network(color, connected[index][0], connected[index][1], current, total, index);
       }
     }
   }
@@ -576,16 +586,12 @@ public class Gameboard {
         test.board = this.board;
         test.numChips = this.numChips;
 
-        if (m.moveKind == ADD && numChips >= 20) 
-            return false;
-         if (m.moveKind == STEP) {
-            if (test.board[m.x1][m.y1] == WHITE || test.board[m.x1][m.y1] == BLACK) {
+        if (test.board[m.x1][m.y1] != EMPTY) {
               return false;
             } 
-            if (m.x1 == m.x2 && m.y1 == m.y2)  {
+          if (numChips >= 20) { 
               return false;
             }
-          }
 
         //No chip may be placed in any of the four corners
         if ((m.x1 == 0 && m.y1 == 0) || (m.x1 == 0 && m.y1 == 7) || (m.x1 == 7 && m.y1 == 0) || (m.x1 == 7 && m.y1 == 7))
@@ -695,6 +701,4 @@ public class Gameboard {
 
         return position;
     }
-
-
 }
