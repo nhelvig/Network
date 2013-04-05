@@ -63,27 +63,26 @@ public class Gameboard {
   }
     }
     
-    public int evaluateBoard (int side) {
+       public int evaluateBoard (int side) {
         int odds = 0;
         final int GOAL_BONUS = 10;
         if (network(side, 0, 0, null, 0, 0)) {
         odds += (10000 - (10 * numChips));
-	    //System.out.println ("Network found!");
-	}
+      //System.out.println ("Network found!");
+        }
         else if (network(switchSide(side), 0, 0, null, 0, 0)) {
             odds += (-10000 + (10 * numChips));
-	}
+        }
         else {
-            odds += (findConnections (side) - findConnections (switchSide(side)));
-	    if (inGoals (side)) {
-	        odds += GOAL_BONUS;
-	    }
-	}
-        
+            odds += (findConnections (side, 0, -1, 0, 0) - findConnections (switchSide(side), 0, -1, 0, 0));
+        if (inGoals (side)) {
+            odds += GOAL_BONUS;
+        }
+      }
+      //  System.out.println("odds: " + odds);
         return odds;
- 
-              
     }
+    
     int COMPUTER;
     int HUMAN;
     boolean called = false;
@@ -367,49 +366,26 @@ public class Gameboard {
     @param color             the color of the connections to be counted
     @return                  the number of chip connections; chip connections may be counted more than once.
      */
-    protected int findConnections (int color) {
-        int connections = 0;
-        boolean checkingWhiteGoal = false;
-        boolean checkingBlackGoal = false;
-        for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 8; y++) {
-                if (board[x][y] != color) {
-                    continue;
-    }
-                if (x == 0 || x == 7) {
-                    checkingWhiteGoal = true;
-    }
-                if (y == 0 || y == 7) {
-                    checkingBlackGoal = true;
-    }
-                if (!checkingWhiteGoal && cChipsUp(color, x, y)[0] != EMPTY) {
-                    connections++;
+   protected int findConnections (int color, int connections, int directionFrom, int xStart, int yStart) {
+      for (int x = xStart; x < 8; x++) {
+          for (int y = yStart; y < 8; y++) {
+              if (board[x][y] != color) {
+                  continue;
+              }
+              int[][] connected = connectedChips(x, y, color);
+              for (int i = 0; i < connected.length; i++) {
+                if (directionFrom >= 0) {
+                  connected[directionFrom][0] = EMPTY;
                 }
-                if (cChipsDiagUpRight(color, x, y)[0] != EMPTY) {
-                    connections++;                
+                if (connected[i][0] != EMPTY) {
+                  if (connected[i][0] >= x || connected[i][1] >= y) {
+                  findConnections(color, connections + 1, i, x + 1, y);
+                  }
                 }
-                if (cChipsRight(color, x, y)[0] != EMPTY) {
-                    connections++;                
-                }
-                if (!checkingBlackGoal && cChipsDiagDownRight(color, x, y)[0] != EMPTY) {
-                    connections++;
-                }
-                if (!checkingWhiteGoal && cChipsDown(color, x, y)[0] != EMPTY) {
-                    connections++;
-                }
-                if (cChipsDiagDownLeft(color, x, y)[0] != EMPTY) {
-                    connections++;
-                }
-                if (!checkingBlackGoal && cChipsLeft(color, x, y)[0] != EMPTY) {
-                    connections++;
-                }
-                if (cChipsDiagUpLeft(color, x, y)[0] != EMPTY) {
-                    connections++;
-                }
-      }
-  }
-        
-        return connections;
+              }
+            }
+          }
+      return connections;
     }
 
     /**connectedChips finds all chips of the same color that are connected to the chip using the 
