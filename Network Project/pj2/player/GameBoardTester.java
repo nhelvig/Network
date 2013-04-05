@@ -296,11 +296,16 @@ public class GameBoardTester {
                 
         //Testing returnBest ...
         System.out.println ("Testing minimax search with alpha beta pruning...");
-        Best bestmove = board4.returnBest (WHITE, 4, -10000, 10000);
+        Best bestmove = board4.returnBest (WHITE, 1, -10000, 10000);
         System.out.println ("Best move should be (7, 1): " + bestmove.move.x1 + " " + bestmove.move.y1);
         board4.makeMove (WHITE, bestmove.move);
+        /*Move testmove = new Move (7,6);
+        System.out.println ("Trying test move 7 6 WHITE");
+        board4.makeMove(WHITE, testmove);
+        System.out.println ("Network status after making testmove: " + board4.network (WHITE, 0, 0, null, 0, 0));*/
+
         System.out.println ("New score after best move for white: " + board4.evaluateBoard(WHITE));
-        System.out.println ("Network status after making best move " + bestmove.move.x1 + bestmove.move.y1 + " is "+ board4.network(WHITE, 0, 0, null, 0, 0));
+	System.out.println ("Network status after making best move " + bestmove.move.x1 + bestmove.move.y1 + " is "+ board4.network(WHITE, 0, 0, null, 0, 0));
      	printBoard(board4);
 
         System.out.println();
