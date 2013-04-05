@@ -524,7 +524,6 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
   }
   if (color == BLACK) {
     if (total == 0) {
-      grandTotal = 0;
     //Iterate through all of the starting goal spaces to find a chip in the goal
     //from which to test for a network. 
       for (int column = 1; column < 7; column++) {
@@ -536,12 +535,10 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
         }
       }
     } else {
-      grandTotal += total;
       checkConnected(color, x, y, checked, total, directionFrom);
         }
   } else if (color == WHITE) {
     if (total == 0) {
-      grandTotal = 0;
     //Iterate through all of the starting goal spaces to find a chip in the goal
     //from which to test for a network. 
       for (int row = 1; row < 7; row++) {
@@ -553,7 +550,6 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
         }
       }
     } else {
-      grandTotal += total;
       checkConnected(color, x, y, checked, total, directionFrom);
       }
   }
