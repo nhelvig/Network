@@ -63,7 +63,7 @@ public class Gameboard {
   }
     }
     
-       public int evaluateBoard (int side) {
+    public int evaluateBoard (int side) {
         int odds = 0;
         final int GOAL_BONUS = 10;
         if (network(side, 0, 0, null, 0, 0)) {
@@ -74,7 +74,7 @@ public class Gameboard {
             odds += (-10000 + (10 * numChips));
         }
         else {
-            odds += (findConnections (side, 0, -1, 0, 0) - findConnections (switchSide(side), 0, -1, 0, 0));
+            odds += (findConnections (side) - findConnections (switchSide(side)));
         if (inGoals (side)) {
             odds += GOAL_BONUS;
         }
@@ -82,10 +82,11 @@ public class Gameboard {
       //  System.out.println("odds: " + odds);
         return odds;
     }
-    
+
+
     int COMPUTER;
     int HUMAN;
-    boolean called = false;
+    boolean called;
     public Best returnBest (int side, int searchdepth, int alpha, int beta) {
         //System.out.println ("called"); 
         if (!called) {
@@ -93,7 +94,7 @@ public class Gameboard {
             HUMAN = switchSide(side);
             //System.out.println (COMPUTER);
             called = true;
-	}
+  }
         Best myBest = new Best();
         Best reply;
         Move [] legalmoves = validMoves (side);
@@ -103,33 +104,28 @@ public class Gameboard {
             System.out.println ("List of valid moves: ");
             System.out.println ("Move" + i + ": " + legalmoves[i].x1 + " " + legalmoves[i].y1);
             i++;
-	    }*/
-        i = 0;
-        if (network (COMPUTER, 0, 0, null, 0, 0)) {
-       	    myBest.score = Integer.MAX_VALUE;
-            //System.out.println ("Win detected for computer with a score of " + myBest.score);
+  }
+        i = 0;*/
+        if (network (COMPUTER, 0, 0, null, 0, 0) || network (switchSide(side), 0, 0, null, 0, 0)) {
+            myBest.score = evaluateBoard (COMPUTER);
+            //System.out.println ("Win detected: " + myBest.move.x1 + " " + myBest.move.y1);
             return myBest;
-	}
-        if (network (HUMAN, 0, 0, null, 0, 0)) {
-       	    myBest.score = Integer.MIN_VALUE;
-            //System.out.println ("Win detected for human with a score of " + myBest.score);
-            return myBest;
-	}
+  }
         if (searchdepth == 0) {
             myBest.score = evaluateBoard(COMPUTER);
             //System.out.println ("Move " + myBest.move.x1 + " " + myBest.move.y1 + ": " + myBest.score);
             return myBest;
-	}
+  }
         
         if (side == COMPUTER) {
             myBest.score = -100000;
-	} 
+  } 
         else {
             myBest.score = 100000;
-	}
+  }
 
         while (legalmoves[i] != null) {
-            //System.out.println ("Move " + legalmoves [i].x1 + " " + legalmoves[i].y1 + " " + myBest.score + " side" +side);
+            //System.out.println ("Move " + legalmoves [i].x1 + " " + legalmoves[i].y1);
             makeMove (side, legalmoves[i]);
             reply = returnBest (switchSide(side), searchdepth - 1, alpha, beta);
             undoMove (side, legalmoves[i]);
@@ -138,19 +134,19 @@ public class Gameboard {
                 myBest.move = legalmoves[i];
                 myBest.score = reply.score;
                 alpha = reply.score;
-	    } 
+      } 
 
             else if ((side == HUMAN) && (reply.score <= myBest.score)) {
-	        myBest.move = legalmoves[i];
+          myBest.move = legalmoves[i];
                 myBest.score = reply.score;
                 beta = reply.score;
-	    }
+      }
 
-	    if (alpha >= beta) {
+      if (alpha >= beta) {
                 return myBest;
-		}
+    }
             i++;
-	}
+  }
         return myBest;
     }
 
@@ -371,26 +367,49 @@ public class Gameboard {
     @param color             the color of the connections to be counted
     @return                  the number of chip connections; chip connections may be counted more than once.
      */
-   protected int findConnections (int color, int connections, int directionFrom, int xStart, int yStart) {
-      for (int x = xStart; x < 8; x++) {
-          for (int y = yStart; y < 8; y++) {
-              if (board[x][y] != color) {
-                  continue;
-              }
-              int[][] connected = connectedChips(x, y, color);
-              for (int i = 0; i < connected.length; i++) {
-                if (directionFrom >= 0) {
-                  connected[directionFrom][0] = EMPTY;
+     protected int findConnections (int color) {
+        int connections = 0;
+        boolean checkingWhiteGoal = false;
+        boolean checkingBlackGoal = false;
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                if (board[x][y] != color) {
+                    continue;
+    }
+                if (x == 0 || x == 7) {
+                    checkingWhiteGoal = true;
+    }
+                if (y == 0 || y == 7) {
+                    checkingBlackGoal = true;
+    }
+                if (!checkingWhiteGoal && cChipsUp(color, x, y)[0] != EMPTY) {
+                    connections++;
                 }
-                if (connected[i][0] != EMPTY) {
-                  if (connected[i][0] >= x || connected[i][1] >= y) {
-                  findConnections(color, connections + 1, i, x + 1, y);
-                  }
+                if (cChipsDiagUpRight(color, x, y)[0] != EMPTY) {
+                    connections++;                
                 }
-              }
-            }
-          }
-      return connections;
+                if (cChipsRight(color, x, y)[0] != EMPTY) {
+                    connections++;                
+                }
+                if (!checkingBlackGoal && cChipsDiagDownRight(color, x, y)[0] != EMPTY) {
+                    connections++;
+                }
+                if (!checkingWhiteGoal && cChipsDown(color, x, y)[0] != EMPTY) {
+                    connections++;
+                }
+                if (cChipsDiagDownLeft(color, x, y)[0] != EMPTY) {
+                    connections++;
+                }
+                if (!checkingBlackGoal && cChipsLeft(color, x, y)[0] != EMPTY) {
+                    connections++;
+                }
+                if (cChipsDiagUpLeft(color, x, y)[0] != EMPTY) {
+                    connections++;
+                }
+      }
+  }
+        
+        return connections;
     }
 
     /**connectedChips finds all chips of the same color that are connected to the chip using the 
@@ -498,9 +517,9 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
     return false;
   }
   if (total > 5 && inWinningGoal(color, x, y)) {
-//    for (int i = 0; i < checked.length; i++) {
-  //    System.out.println(checked[i][0] + " " + checked[i][1]);
-    //}
+ //   for (int i = 0; i < checked.length; i++) {
+    //  System.out.println(checked[i][0] + " " + checked[i][1]);
+   // }
     hasNetwork = true;
   }
   if (color == BLACK) {
@@ -705,4 +724,6 @@ public boolean network(int color, int x, int y, int[][] checked, int total, int 
 
         return position;
     }
+
+   
 }
