@@ -9,6 +9,8 @@ public class Gameboard {
     private boolean hasNetwork;
     private boolean isFull;
     private int numChips;
+    private int numWhiteChips;
+    private int numBlackChips;
 
     public Gameboard() {
      	board = new int[8][8];
@@ -26,23 +28,35 @@ public class Gameboard {
     public void makeMove (int color, Move m) {
         if (m.moveKind == ADD) {
             board[m.x1][m.y1] = color;
+            if (color == WHITE) {
+              numWhiteChips += 1;
+            }
+            if (color == BLACK) {
+              numBlackChips += 1;
+            }
             numChips++;
-	}
+  }
         if (m.moveKind == STEP) {
             board[m.x2][m.y2] = EMPTY;
             board[m.x1][m.y1] = color;
-	}   
+  }   
     }
 
     public void undoMove (int color, Move m) {
         if (m.moveKind == ADD) {
             board[m.x1][m.y1] = EMPTY;
+            if (color == WHITE) {
+              numWhiteChips -= 1;
+            }
+            if (color == BLACK) {
+              numBlackChips -= 1;
+            }
             numChips--;
-	}
+  }
         if (m.moveKind == STEP) {
             board[m.x2][m.y2] = board[m.x1][m.y1];
             board[m.x1][m.y1] = EMPTY;
-	}
+  }
     }
     
     public int evaluateBoard (int side) {
@@ -139,7 +153,16 @@ public class Gameboard {
         return EMPTY;
     }
 
-    /** Implemented by Nick
+ private boolean tenChips(int color) {
+      if (color == WHITE) {
+        return numWhiteChips == 10;
+      }
+      if (color == BLACK) {
+        return numBlackChips == 10;
+      }
+      return false;
+    }
+     /** Implemented by Nick
        validMoves generates a list of all possible moves by going through each space of
        the internal game board and checking whether or not that space is a valid space 
        to play a piece. If it is, it is added to the Move[]. If it is not a valid move,
@@ -147,17 +170,33 @@ public class Gameboard {
        @param color       the color for which the list of moves is to be generated 
        @return            returns an array of valid moves */
     protected Move[] validMoves(int color) {
-        Move[] valids = new Move[1000];
+        Move[] valids = new Move[770];
         int index = 0;
         for (int x = 0; x < 8; x++) {
-          for (int y = 0; y < 8; y++) { 
-            Move addmove = new Move(x,y);
-            if (isValid (addmove, color)) {
-              valids[index] = addmove;
-              index++;
+          for (int y = 0; y < 8; y++) {
+            if (tenChips(color)) {
+              if (board[x][y] == color) {
+                for (int x1 = 0; x1 < 8; x1++) {
+                  for (int y1 = 0; y1 < 8; y1++) {
+                    Move move = new Move(x1, y1, x, y);
+                    if (isValid (move, color)) {
+                    valids[index] = move;
+                    index++;
+                    }
+                  }
+                }
+              }
+            } else {
+              Move move = new Move(x,y);
+              if (isValid (move, color)) {
+                valids[index] = move;
+                index++;
+              }
             }
           }
-        }
+        } 
+        return valids;
+    }
         /*for (int x = 0; x < 8; x++) {
           for (int y = 0; y < 8; y++) { 
               if (board[x][y] == color) {
