@@ -341,6 +341,87 @@ public class GameBoardTester {
         printBoard (board5);
         System.out.println ("Network status after making best move on this board: " + board5.network(WHITE, 0, 0, null, 0, 0));
         System.out.println ("Evaluate board's score for this board: " + board5.evaluateBoard (WHITE));
+
+        System.out.println();
+        System.out.println ("Checking chance-to-win test 1.");
+        board5 = new Gameboard();
+        board5.initializeBoard();
+        move1 = new Move (1, 1);
+        board5.makeMove (BLACK, move1);
+        move2 = new Move (2, 1);
+        board5.makeMove (BLACK, move2);
+        move3 = new Move (4, 1);
+        board5.makeMove (BLACK, move3);
+        move4 = new Move (5, 1);
+        board5.makeMove (BLACK, move4);
+        move5 = new Move (6, 1);
+        board5.makeMove (WHITE, move5);
+        move6 = new Move (0, 2);
+        board5.makeMove (WHITE, move6);
+        move7 = new Move (3, 2);
+        board5.makeMove (WHITE, move7);
+        move14 = new Move (1, 3);
+        board5.makeMove (WHITE, move14);
+        move15 = new Move (5, 3);
+        board5.makeMove (WHITE, move15);
+        move8 = new Move (3, 5);
+        board5.makeMove (WHITE, move8);
+        move9 = new Move (5, 5);
+        board5.makeMove (BLACK, move9);
+        move10 = new Move (6, 5);
+        board5.makeMove (WHITE, move10);
+        move11 = new Move (1, 6);
+        board5.makeMove (BLACK, move11);
+        move12 = new Move (2, 6);
+        board5.makeMove (BLACK, move12);
+        move13 = new Move (7, 6);
+        board5.makeMove (WHITE, move13);
+        System.out.println ("Board scenario looks like: ");
+        printBoard(board5);
+        bestmove = board5.returnBest (WHITE, 3, -10000, 10000);
+        System.out.println ("Making best move: " + bestmove.move.x1 + " " + bestmove.move.y1);
+        board5.makeMove (WHITE, bestmove.move);
+        System.out.println ("New board: ");
+        printBoard(board5);
+        System.out.println ("Network status after making best move on this board: " + board5.network(WHITE, 0, 0, null, 0, 0));
+
+        System.out.println ();
+        System.out.println ("Testing blocking test #1");
+        board5 = new Gameboard();
+        board5.initializeBoard();
+        move1 = new Move (2, 0);
+        board5.makeMove (BLACK, move1);
+        move2 = new Move (0, 1);
+        board5.makeMove (WHITE, move2);
+        move3 = new Move (3, 1);
+        board5.makeMove (BLACK, move3);
+        move4 = new Move (5, 1);
+        board5.makeMove (WHITE, move4);
+        move5 = new Move (4, 2);
+        board5.makeMove (WHITE, move5);
+        move7 = new Move (5, 3);
+        board5.makeMove (BLACK, move7);
+        move8 = new Move (0, 4);
+        board5.makeMove (WHITE, move8);
+        move9 = new Move (1, 5);
+        board5.makeMove (WHITE, move9);
+        move10 = new Move (3, 5);
+        board5.makeMove (BLACK, move10);
+        move12 = new Move (2, 7);
+        board5.makeMove (BLACK, move12);
+        System.out.println ("Scenario looks like: ");
+        System.out.println ("Black's winning move is adding to 2 3");
+        printBoard(board5);
+        bestmove = board5.returnBest (WHITE, 2, -10000, 10000);
+        System.out.println ("White attempts to block by adding to " + bestmove.move.x1 + " " + bestmove.move.y1);
+        board5.makeMove (WHITE, bestmove.move);
+        System.out.println ("New board looks like: ");
+        printBoard(board5);
+        System.out.println ("Network status after making best move on this board: " + board5.network(WHITE, 0, 0, null, 0, 0));
+
+        
+
+
         
 
 
