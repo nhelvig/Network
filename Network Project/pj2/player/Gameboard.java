@@ -103,11 +103,16 @@ public class Gameboard {
             System.out.println ("List of valid moves: ");
             System.out.println ("Move" + i + ": " + legalmoves[i].x1 + " " + legalmoves[i].y1);
             i++;
+	    }*/
+        i = 0;
+        if (network (COMPUTER, 0, 0, null, 0, 0)) {
+       	    myBest.score = Integer.MAX_VALUE;
+            //System.out.println ("Win detected for computer with a score of " + myBest.score);
+            return myBest;
 	}
-        i = 0;*/
-        if (network (side, 0, 0, null, 0, 0) || network (switchSide(side), 0, 0, null, 0, 0)) {
-       	    myBest.score = evaluateBoard (COMPUTER);
-            //System.out.println ("Win detected: " + myBest.move.x1 + " " + myBest.move.y1);
+        if (network (HUMAN, 0, 0, null, 0, 0)) {
+       	    myBest.score = Integer.MIN_VALUE;
+            //System.out.println ("Win detected for human with a score of " + myBest.score);
             return myBest;
 	}
         if (searchdepth == 0) {
@@ -124,7 +129,7 @@ public class Gameboard {
 	}
 
         while (legalmoves[i] != null) {
-            //System.out.println ("Move " + legalmoves [i].x1 + " " + legalmoves[i].y1);
+            //System.out.println ("Move " + legalmoves [i].x1 + " " + legalmoves[i].y1 + " " + myBest.score + " side" +side);
             makeMove (side, legalmoves[i]);
             reply = returnBest (switchSide(side), searchdepth - 1, alpha, beta);
             undoMove (side, legalmoves[i]);
