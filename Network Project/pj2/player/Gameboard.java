@@ -64,73 +64,89 @@ public class Gameboard {
     }
     
     public int evaluateBoard (int side) {
-      int odds = 0;
-      int GOAL_BONUS = 10;
-      if (network(COMPUTER, 0, 0, null, 0, 0)) {
-        odds = 10000;
-      } else if (network(HUMAN, 0, 0, null, 0, 0)) {
-        odds =  10000;
-      } else if (inGoals (side)) {
-        odds = GOAL_BONUS + (findConnections (side));
-      } else {
-        odds = findConnections (side);
-      }
-      if (side == HUMAN){
-        odds = odds * (-1);
-      }
-      System.out.println("odds: " + odds);
-      return odds;        
+        int odds = 0;
+        final int GOAL_BONUS = 10;
+        if (network(side, 0, 0, null, 0, 0)) {
+        odds += (10000 - (10 * numChips));
+	    //System.out.println ("Network found!");
+	}
+        else if (network(switchSide(side), 0, 0, null, 0, 0)) {
+            odds += (-10000 + (10 * numChips));
+	}
+        else {
+            odds += (findConnections (side) - findConnections (switchSide(side)));
+	    if (inGoals (side)) {
+	        odds += GOAL_BONUS;
+	    }
+	}
+        
+        return odds;
+ 
+              
     }
-
-
     int COMPUTER;
     int HUMAN;
-    public Best returnBest (int side, int searchdepth, int alpha, int beta, boolean called) {
+    boolean called = false;
+    public Best returnBest (int side, int searchdepth, int alpha, int beta) {
+        //System.out.println ("called"); 
         if (!called) {
             COMPUTER = side;
             HUMAN = switchSide(side);
+            //System.out.println (COMPUTER);
             called = true;
-        }
+	}
         Best myBest = new Best();
         Best reply;
-        Move [] legalmoves = validMoves(side);
+        Move [] legalmoves = validMoves (side);
+        //myBest.move = legalmoves[0];
+        int i = 0;
         /*while (legalmoves[i] != null) {
             System.out.println ("List of valid moves: ");
             System.out.println ("Move" + i + ": " + legalmoves[i].x1 + " " + legalmoves[i].y1);
             i++;
-  }*/
-        if (network(side, 0, 0, null, 0, 0) || network(switchSide(side), 0, 0, null, 0, 0) || searchdepth == 0) {
-            Best thisBest = new Best();
-            thisBest.score = evaluateBoard(side);
-            return thisBest;
-        }
+	}
+        i = 0;*/
+        if (network (side, 0, 0, null, 0, 0) || network (switchSide(side), 0, 0, null, 0, 0)) {
+       	    myBest.score = evaluateBoard (COMPUTER);
+            //System.out.println ("Win detected: " + myBest.move.x1 + " " + myBest.move.y1);
+            return myBest;
+	}
+        if (searchdepth == 0) {
+            myBest.score = evaluateBoard(COMPUTER);
+            //System.out.println ("Move " + myBest.move.x1 + " " + myBest.move.y1 + ": " + myBest.score);
+            return myBest;
+	}
+        
         if (side == COMPUTER) {
-            myBest.score = Integer.MIN_VALUE;
-        } 
+            myBest.score = -100000;
+	} 
         else {
-            myBest.score = Integer.MAX_VALUE;
-        }
-        for (int i = 0; legalmoves[i] != null; i++) {
+            myBest.score = 100000;
+	}
+
+        while (legalmoves[i] != null) {
+            //System.out.println ("Move " + legalmoves [i].x1 + " " + legalmoves[i].y1);
             makeMove (side, legalmoves[i]);
-            reply = returnBest (switchSide(side), searchdepth - 1, alpha, beta, called);
+            reply = returnBest (switchSide(side), searchdepth - 1, alpha, beta);
             undoMove (side, legalmoves[i]);
+
             if ((side == COMPUTER) && (reply.score >= myBest.score)) {
                 myBest.move = legalmoves[i];
                 myBest.score = reply.score;
                 alpha = reply.score;
-            } else if ((side == HUMAN) && (reply.score <= myBest.score)) {
-                myBest.move = legalmoves[i];
+	    } 
+
+            else if ((side == HUMAN) && (reply.score <= myBest.score)) {
+	        myBest.move = legalmoves[i];
                 myBest.score = reply.score;
                 beta = reply.score;
-              }
-              if (alpha >= beta) {
+	    }
+
+	    if (alpha >= beta) {
                 return myBest;
-              }
-        i++;
-        }
-        if (myBest.move.moveKind == QUIT) {
-          myBest.move = legalmoves[0];
-        }
+		}
+            i++;
+	}
         return myBest;
     }
 
