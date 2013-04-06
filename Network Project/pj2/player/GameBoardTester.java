@@ -296,7 +296,7 @@ public class GameBoardTester {
                 
         //Testing returnBest ...
         System.out.println ("Testing minimax search with alpha beta pruning...");
-        Best bestmove = board4.returnBest (WHITE, 4, -10000, 10000);
+        Best bestmove = board4.returnBest (WHITE, 4, Integer.MIN_VALUE, Integer.MAX_VALUE);
         System.out.println ("Best move should be (7, 1): " + bestmove.move.x1 + " " + bestmove.move.y1);
         board4.makeMove (WHITE, bestmove.move);
         /*Move testmove = new Move (7,6);
@@ -333,7 +333,7 @@ public class GameBoardTester {
         move10 = new Move (1, 6);
         board5.makeMove (BLACK, move10);
         printBoard(board5);
-        bestmove = board5.returnBest (WHITE, 4, -10000, 10000);
+        bestmove = board5.returnBest (WHITE, 4, Integer.MIN_VALUE, Integer.MAX_VALUE);
         System.out.println ("Best move should be add to 72, 75 is also acceptable.");
         System.out.println ("Move returnBest chooses is: " + bestmove.move.x1 + " " + bestmove.move.y1 + " with a score after of " + bestmove.score);
         System.out.println ("After move, the board looks like: ");
@@ -378,7 +378,7 @@ public class GameBoardTester {
         board5.makeMove (WHITE, move13);
         System.out.println ("Board scenario looks like: ");
         printBoard(board5);
-        bestmove = board5.returnBest (WHITE, 3, -10000, 10000);
+        bestmove = board5.returnBest (WHITE, 3, Integer.MIN_VALUE, Integer.MAX_VALUE);
         System.out.println ("Making best move: " + bestmove.move.x1 + " " + bestmove.move.y1);
         board5.makeMove (WHITE, bestmove.move);
         System.out.println ("New board: ");
@@ -412,7 +412,7 @@ public class GameBoardTester {
         System.out.println ("Scenario looks like: ");
         System.out.println ("Black's winning move is adding to 2 3");
         printBoard(board5);
-        bestmove = board5.returnBest (WHITE, 2, -10000, 10000);
+        bestmove = board5.returnBest (WHITE, 4, Integer.MIN_VALUE, Integer.MAX_VALUE);
         System.out.println ("White attempts to block by adding to " + bestmove.move.x1 + " " + bestmove.move.y1);
         board5.makeMove (WHITE, bestmove.move);
         System.out.println ("New board looks like: ");
@@ -420,6 +420,39 @@ public class GameBoardTester {
         System.out.println ("Network status after making best move on this board: " + board5.network(WHITE, 0, 0, null, 0, 0));
 
         
+	System.out.println ();
+        System.out.println ("Testing blocking test #2");
+        board5 = new Gameboard();
+        board5.initializeBoard();
+        move1 = new Move (1, 0);
+        board5.makeMove (BLACK, move1);
+        move2 = new Move (0, 1);
+        board5.makeMove (WHITE, move2);
+        move4 = new Move (6, 1);
+        board5.makeMove (WHITE, move4);
+        move5 = new Move (2, 2);
+        board5.makeMove (WHITE, move5);
+        move7 = new Move (2, 3);
+        board5.makeMove (WHITE, move7);
+        move8 = new Move (3, 4);
+        board5.makeMove (BLACK, move8);
+        move9 = new Move (6, 4);
+        board5.makeMove (BLACK, move9);
+        move10 = new Move (7, 4);
+        board5.makeMove (WHITE, move10);
+        move12 = new Move (1, 6);
+        board5.makeMove (BLACK, move12);
+        move13 = new Move (6, 7);
+        board5.makeMove (BLACK, move13);
+        System.out.println ("Scenario looks like: ");
+        System.out.println ("Black's winning move is adding to 3 6");
+        printBoard(board5);
+        bestmove = board5.returnBest (WHITE, 4, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        System.out.println ("White attempts to block by adding to " + bestmove.move.x1 + " " + bestmove.move.y1);
+        board5.makeMove (WHITE, bestmove.move);
+        System.out.println ("New board looks like: ");
+        printBoard(board5);
+        System.out.println ("Network status after making best move on this board: " + board5.network(WHITE, 0, 0, null, 0, 0));
 
 
         
