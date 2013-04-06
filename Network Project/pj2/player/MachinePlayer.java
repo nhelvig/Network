@@ -28,7 +28,7 @@ public class MachinePlayer extends Player {
       if (color == 1) {
           side = WHITE;
       }
-      depth = 2;
+      depth = 4;
       myboard = new Gameboard ();
       myboard.initializeBoard(); 
   }
@@ -51,16 +51,17 @@ public class MachinePlayer extends Player {
   // Returns a new move by "this" player.  Internally records the move (updates
   // the internal game board) as a move by "this" player.
   public Move chooseMove() {
-      Best myBest = myboard.returnBest(side, depth, -10000, 10000, false);
+      Best myBest = myboard.returnBest(side, depth, -10000, 10000);
       Move bestmove = myBest.move;
       if (bestmove.moveKind != QUIT) {
           myboard.makeMove(side, bestmove);
+          System.out.println ("Best: " + myBest.score);
           return bestmove;
-      }
+      } 
       else {
-        bestmove = myboard.validMoves(side)[0];
-        myboard.makeMove(side, bestmove);
-        return bestmove;
+          bestmove = myboard.validMoves(side)[0];
+          myboard.makeMove (side, bestmove);
+          return bestmove;
       }
   } 
 
