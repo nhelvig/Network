@@ -3,8 +3,8 @@
 Name of student running submit: Nick Helvig
 Login of student running submit: cs61b-yl
 
-Second team member's name:
-Second team member's login:
+Second team member's name: Prithviraj Pandian
+Second team member's login: cs61b-cg
 
 Third team member's name (if any):
 Third team member's login:
@@ -62,145 +62,78 @@ sure to modify this file to reflect these changes before you submit your
 project.  Your design of classes and interfaces with be worth about 10% of your
 grade.
 
-  *2)  generating a list of all valid moves,
-  *3)  finding the chips (of the same color) that form connections with a chip,
-  *4)  determining whether a game board contains any networks for a given
-       player (very difficult; put your smartest teammate on this),
-
 
 We will use a class called GameBoard that will contain all the methods pertaining to the board itself, as well as
-contain the gameboard information in an int [] array of 77. A 1 will represent a black piece in that position, a 2
-will represent a white piece, and a 0 will represent no piece at all.  The gameboard is private to 
-each player. A gameboard instance will be updated for each player as each move is made.
+contain the gameboard information in an int [][] array of 8 by 8. A 1 will represent a black piece in that position, a 2
+will represent a white piece, and a 0 will represent no piece at all.
 
 
-
-1.
 Check Move Module:
-/***Method checks whether a move passed in as a parameter is legal for the given player. 
+/*** Implemented by Prithvi
+Method checks whether a move passed in as a parameter is legal for the given player. 
 Returns true if move is legal, false if not. Method will be in the GameBoard Class
 */
 public boolean isValid (Move move, int player);
 
 
-2.
-Implemented by Nick
+Evaluation Module:
+/*** Implemented by Prithvi
+This method will be in the GameBoard class, and given a Gameboard "this" and which player it is evaluating for (1
+if the current player is black, 2 if the current player is white),
+it will return an integer value between negative and positive infinity. Negative values indicate that the
+opponent is currently winning for the board, and positive values indicate that the player is winning for
+for the given board.  It will call the method network in  the determine network module in order to find out if a player has a network or not. If a player has a network, it will return a value of 10000 minus a penalty for the number of
+chips on the board. The penalty will ensure that a board which has a quicker win is rated higher than a board with
+a win and many pieces. 
+*/
+public double evaluateBoard (int player);
+
+MiniMax module:
+/*** Implemented by Prithvi
+This method will be in the GameBoard class, and given a GameBoard "this" and which player it is evaluating for
+(1 if the player is black, 2 if the player is white), it will return the best possible move in the current circumstance
+within the chosen search depth. The method will utilize many calls to method evaluateBoard in the Evaluation module
+to pick the best possible move. The method will also need to call the method network in the network identifier module.
+The method will be an implementation of the minimax search algorithm with alpha beta pruning. 
+*/
+
+public Move returnBest (int player, int searchdepth, int alpha, int beta);
+
+
+/***Implemented by Nick
 validMoves generates a list of all possible moves by going through each space of
 the internal game board and checking whether or not that space is a valid space 
 to play a piece. If it is, it is added to the Move[]. If it is not a valid move,
 nothing happens. 
 validMoves takes no parameters
-returns an array of valid moves
-protected Move[] validMoves() {
+returns an array of valid moves */
+protected Move[] validMoves();
+
+/**Implemented by Nick
+       network() evaluates a board and check's each chips list of connections to see if 
+       there is a Network of 6 or more chips. Uses an array to make sure that the same chip is not 
+       called more than once. Also keeps track of the direction of the chip so that two chips in a
+       line are not allowed to be in the same network. Makes sure the beginning and ending chips are
+       in the goal areas using inGoal().
+       @param color              the color of the player searching for a network
+       @param x                  x-coordinate of the current chip 
+                                 (used in recursive calls, default call will be 0)
+       @param y                  y-coordinate of the current chip 
+                                 (used in recursive calls, default call will be 0)
+       @param checked            the list of previously used chips 
+                                 (used in recursive calls, default call will be null)
+       @param total              length of the current network, default is 0
+       @param directionFrom      during the function call, direction from is the index position of the 
+                                 list of connected chips. Because each element in the array of connected 
+                                 chips corresponds to a certain direction, this allows future calls to not 
+                                 need to search in that direction.
+       @returns                  true if there is a Network for the given player
+                                 false if there are no valid Networks 
+       */
+
+public boolean containsNetwork (int color, int x, int y, int[][] checked, int total, int directionFrom) {
   
 }
 
 
 
-3.
-Implemented by Nick
-These would be in MachinePlayer.java
-cChip functions are helper functions that find the closest chip of the same color
-in the up, down, left, right, and diagonal spaces. 
-@params color is the color of the chips you are looking for
-        coordinate - location of the chip
-@returns the coordinates of the closest chip of that color. if the closest chip is
-         not of the same color, returns null
-
-protected int[][] cChipsUp (int color, coordinate) {
-  
-}
-
-protected int[][] cChipsDown (int color, coordinate) {
-  
-}
-
-protected int[][] cChipsRight (int, color, coordinate) {
-  
-}
-
-protected int[][] cChipsLeft (int color, coordinate) {
-  
-}
-
-protected int[] cChipsDiagUpLeft (int color, coordinate) {
-  
-}
-
-protected int[] cChipsDiagUpRight (int color, coordinate) {
-  
-}
-
-protected int[] cChipsDiagDownLeft (int color, coordinate) {
-  
-}
-
-protected int[] cChipsDiagDownRight (int color, coordinate) {
-  
-}
-
-connectedChips finds all chips of the same color that are connected to the chip using the 
-cChip functions and returns them as an array of chip coordinates.
-@params  color - the color of the chip (black or white)
-         coordinate - the location of the chip on the gameboard
-@returns an array of all the connected chip positions
-
-protected int[] connectedChips(int color, int coordinate) {
-  
-}
-
-
-
-4. 
-
-inGoal() checks to see if a chip is in the goal area for a certain player. This will be used
-to check the start and end points of the network. Since the start and end points both need to
-be in a goal area, inGoal() will make sure the connection is valid for the start and end points
-@params color - the color of the player looking to see if his chip is in a goal
-        coordinate - location of the chip
-@returns true if the chip is in the goal
-         false if the chip is not in the player's goal area
-public boolean inGoal(int color, int location)
-
-
-containsNetworks() evaluates a board and check's each chips list of connections to see if 
-there is a Network of 6 or more chips. Uses an array to make sure that the same chip is not 
-called more than once. Also keeps track of the direction of the chip so that two chips in a
-line are not allowed to be in the same network. Makes sure the beginning and ending chips are
-in the goal areas using inGoal().
-@params color - the color of the player searching for a network
-@returns true if there is a Network for the given player
-         false if there are no valid Networks
-
-public boolean containsNetwork (int color) {
-  
-}
-
-
-5.
-Evaluation Module:
-/***
-This method will be in the GameBoard class, and given a Gameboard "this" and which player it is evaluating for (1
-if the current player is black, 2 if the current player is white),
-it will return a double between -1.0 and 1.0 that estimates the strength of the board. -1 means the opponent has 
-already won for this board, and 1 means the player has already won for this board. It will call the method containsNetwork in 
-the determine network module in order to find out if a player has a network or not. It will also use repeated calls
-to that method containsNetwork so that it can give an accurate assessment of which player is closest to winning, with high 
-positives correlating to high likelihood of the current player winning, and low negatives correlating to low likelihood of 
-current player winning. 
-*/
-public double evaluateBoard (int player);
-
-
-
-6.
-MiniMax module:
-/***
-This method will be in the GameBoard class, and given a GameBoard "this" and which player it is evaluating for
-(1 if the player is black, 2 if the player is white), it will return the best possible move in the current circumstance
-within the chosen search depth. The method will utilize many calls to method evaluateBoard in the Evaluation module
-to pick the best possible move. The method will also need to call the method containsNetwork in the network identifier module.
-*/
-
-public Move returnBest (int player, int searchdepth)
-public Move returnBest (int player, int searchdepth, int alpha, int beta);
